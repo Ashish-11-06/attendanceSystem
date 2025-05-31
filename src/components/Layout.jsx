@@ -9,6 +9,7 @@ import {
   UsergroupAddOutlined,
   EnvironmentOutlined,
   SmileOutlined,
+  UserOutlined, 
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -27,6 +28,7 @@ const AppLayout = ({ children }) => {
     { key: '/unit-list', icon: <ApartmentOutlined />, label: 'Unit List' },
     { key: '/volunteer-list', icon: <UsergroupAddOutlined />, label: 'Volunteer List' },
     { key: '/location-list', icon: <EnvironmentOutlined />, label: 'Location List' },
+    { key: '/profile', icon: <UserOutlined />, label: 'Profile' },
   ];
 
   const SidebarMenu = (

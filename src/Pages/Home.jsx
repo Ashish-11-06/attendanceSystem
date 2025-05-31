@@ -37,6 +37,7 @@ const cardData = [
     gradient: 'linear-gradient(135deg, #f368e0, #fcd3ff)',
     route: '/location-list',
   },
+
 ];
 
 const Home = () => {

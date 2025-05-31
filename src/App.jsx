@@ -9,6 +9,7 @@ import Shru from './Pages/shru';
 import UnitList from './Pages/UnitList';
 import VolunteerList from './Pages/VolunteerList';
 import LocationList from './Pages/LocationList';
+import Profile from './Pages/Profile';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/unit-list" element={<UnitList />} />
           <Route path="/volunteer-list" element={<VolunteerList />} />
           <Route path="/location-list" element={<LocationList />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </AppLayout>
     </Router>
