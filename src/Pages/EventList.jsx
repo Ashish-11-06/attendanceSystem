@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Table, Input, DatePicker, Row, Col, Button } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-
-const { Search } = Input;
 
 const EventList = () => {
   const [searchText, setSearchText] = useState('');
@@ -74,9 +73,37 @@ const EventList = () => {
 
   return (
     <div style={{ padding: 16, background: '#f4f7fa', minHeight: '100vh' }}>
-      <h1 style={{ textAlign: 'center', marginBottom: 24 }}>Event List</h1>
+      <h1 style={{ marginBottom: 24 }}>Event List</h1>
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
+      {/* Search and button row */}
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'space-between',
+          gap: 16,
+          marginBottom: 24,
+        }}
+      >
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
+          <Input
+            placeholder="Search by event name or location"
+            allowClear
+            size="large"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            prefix={<SearchOutlined style={{ color: '#999' }} />}
+            style={{ width: 250 }}
+          />
+          <DatePicker
+            placeholder="Filter by date"
+            onChange={(date) => setSelectedDate(date)}
+            allowClear
+            size="large"
+            style={{ width: 180 }}
+          />
+        </div>
+
         <Button
           type="primary"
           size="large"
@@ -94,30 +121,6 @@ const EventList = () => {
         </Button>
       </div>
 
-      {/* Smaller Search + Date Picker */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-        <Col xs={24} sm={16} md={12} lg={8}>
-          <Search
-            placeholder="Search by event name or location"
-            allowClear
-            enterButton="Search"
-            size="large"
-            onSearch={(value) => setSearchText(value)}
-            onChange={(e) => setSearchText(e.target.value)}
-            style={{ width: '100%' }}
-          />
-        </Col>
-        <Col xs={24} sm={8} md={6} lg={4}>
-          <DatePicker
-            placeholder="Filter by date"
-            onChange={(date) => setSelectedDate(date)}
-            allowClear
-            size="large"
-            style={{ width: '100%' }}
-          />
-        </Col>
-      </Row>
-
       <div
         style={{
           background: '#ffffff',
@@ -131,6 +134,7 @@ const EventList = () => {
           columns={columns}
           pagination={{ pageSize: 10 }}
           bordered
+          size="small"   
           scroll={{ x: 'max-content' }}
         />
       </div>

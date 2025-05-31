@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Table, Input, Row, Col, Button } from 'antd';
-
-const { Search } = Input;
+import { SearchOutlined } from '@ant-design/icons';
 
 const LocationList = () => {
   const [searchText, setSearchText] = useState('');
@@ -34,50 +33,38 @@ const LocationList = () => {
 
   return (
     <div style={{ padding: 30, background: '#f4f7fa', minHeight: '100vh' }}>
-      <h1 style={{ textAlign: 'center', marginBottom: 30 }}>Location List</h1>
+      <h1 style={{ justifyContent: 'flex-start', marginBottom: 30 }}>Location List</h1>
 
-      {/* Add Location Button */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          marginBottom: 16,
-          flexWrap: 'wrap',
-          gap: '10px',
-        }}
-      >
-        <Button
-          type="primary"
-          size="large"
-          style={{
-            fontSize: 18,
-            padding: '12px 35px',
-            background: '#3f87f5',
-            borderColor: '#3f87f5',
-            borderRadius: 8,
-            boxShadow: '0 3px 10px rgba(63, 135, 245, 0.3)',
-          }}
-          onClick={handleAddLocation}
-        >
-          Add Location
-        </Button>
-      </div>
-
-      {/* Smaller Search Input */}
-      <Row justify="start" style={{ marginBottom: 24 }}>
-       <Col xs={24} sm={20} md={16} lg={12} xl={10}>
-          <Search
+      {/* Search and Add Location button in the same row */}
+      <Row justify="space-between" align="middle" style={{ marginBottom: 24 }} gutter={[16, 16]}>
+        <Col xs={24} sm={18} md={16} lg={12} xl={10}>
+          <Input
             placeholder="Search by address, state or city"
             allowClear
-            enterButton="Search"
             size="large"
-            onSearch={value => setSearchText(value)}
+            prefix={<SearchOutlined style={{ color: '#999' }} />}
+            value={searchText}
             onChange={e => setSearchText(e.target.value)}
-            style={{
-              borderRadius: 8,
-              width: '100%',
-            }}
+            style={{ borderRadius: 8, width: '100%' }}
           />
+        </Col>
+
+        <Col>
+          <Button
+            type="primary"
+            size="large"
+            style={{
+              fontSize: 18,
+              padding: '12px 35px',
+              background: '#3f87f5',
+              borderColor: '#3f87f5',
+              borderRadius: 8,
+              boxShadow: '0 3px 10px rgba(63, 135, 245, 0.3)',
+            }}
+            onClick={handleAddLocation}
+          >
+            Add Location
+          </Button>
         </Col>
       </Row>
 
@@ -95,6 +82,7 @@ const LocationList = () => {
           columns={columns}
           pagination={{ pageSize: 10 }}
           bordered
+          size="small"   
           scroll={{ x: 'max-content' }}
         />
       </div>
