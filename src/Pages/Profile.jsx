@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import {
   Card,
   Avatar,
@@ -24,6 +25,8 @@ import {
 const { Title } = Typography;
 
 const Profile = () => {
+  const navigate = useNavigate(); // Initialize navigate
+
   const [imageUrl, setImageUrl] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
@@ -73,7 +76,10 @@ const Profile = () => {
 
   const handleCancel = () => setIsModalVisible(false);
 
-  const handleLogout = () => message.warning('Logged out!');
+  const handleLogout = () => {
+    message.warning('Logged out!');
+    navigate('/login');  // Redirect to login page
+  };
 
   // Adjust avatar size for smaller screens
   const avatarSize = windowWidth < 480 ? 70 : 100;
@@ -93,15 +99,14 @@ const Profile = () => {
       <div
         style={{
           width: '100%',
-          maxWidth: 480, // limit max width for better balance
+          maxWidth: 480,
           background: 'white',
           borderRadius: 20,
           boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
           overflow: 'hidden',
-          minHeight: 480, // prevents card from being too short or tall
+          minHeight: 480,
           display: 'flex',
           flexDirection: 'column',
-          // Add some padding inside the card for content
           paddingBottom: 20,
         }}
       >

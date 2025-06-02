@@ -75,7 +75,7 @@ const AppLayout = ({ children }) => {
         items={[profileMenuItem]}
         style={{
           borderRight: 0,
-          marginTop: isMobile ? 380 : 0,  // <-- Increase this value to push profile lower on mobile
+          marginTop: isMobile ? 250 : 0,  // <-- Increase this value to push profile lower on mobile
         }}
       />
     </div>

@@ -13,6 +13,7 @@
     "ant": "^0.0.0",
     "antd": "^5.25.3",
     "d": "^1.0.2",
+    "framer-motion": "^12.15.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.1"
