@@ -133,7 +133,7 @@ const VolunteerList = () => {
           boxSizing: 'border-box',
         }}
       >
-        <h1 style={{ marginBottom: 30, textAlign: 'center' }}>Volunteer List</h1>
+        <h1 style={{ marginBottom: 30, textAlign: 'left' }}>Volunteer List</h1>
 
         <Row
           justify="space-between"
