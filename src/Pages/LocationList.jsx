@@ -1,34 +1,44 @@
-import React, { useState } from 'react';
-import { Table, Input, Row, Col, Button, Form } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Table, Input, Row, Col, Button, Form, Spin, Alert } from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import AddLocationModal from '../components/Modals/AddLocationModal';
-
+import { addLocation, fetchAllLocations } from '../Redux/Slices/locationSlice';
 
 const LocationList = () => {
+  const dispatch = useDispatch();
   const [searchText, setSearchText] = useState('');
-  const [dataSource, setDataSource] = useState([
-    { key: '1', address: '123 Main St', state: 'California', city: 'Los Angeles' },
-    { key: '2', address: '456 Oak Ave', state: 'Texas', city: 'Austin' },
-  ]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
 
+  const { locations, loading, error } = useSelector((state) => state.locations);
+
+  // States and Cities arrays moved here outside handler
   const states = ['California', 'Texas', 'New York', 'Florida', 'Illinois'];
   const cities = ['Los Angeles', 'Austin', 'New York City', 'Miami', 'Chicago'];
 
-  const filteredData = dataSource.filter(({ address, state, city }) => {
-    const searchLower = searchText.toLowerCase();
-    return (
-      address.toLowerCase().includes(searchLower) ||
-      state.toLowerCase().includes(searchLower) ||
-      city.toLowerCase().includes(searchLower)
-    );
-  });
+  useEffect(() => {
+    dispatch(fetchAllLocations());
+  }, [dispatch]);
+
+const filteredData = locations.filter(({ address, state, city }) => {
+  const searchLower = searchText.toLowerCase();
+
+  const addressStr = address ? address.toLowerCase() : '';
+  const stateStr = state ? state.toLowerCase() : '';
+  const cityStr = city ? city.toLowerCase() : '';
+
+  return (
+    addressStr.includes(searchLower) ||
+    stateStr.includes(searchLower) ||
+    cityStr.includes(searchLower)
+  );
+});
+
 
   const columns = [
     {
       title: 'Sr. No.',
-      dataIndex: 'key',
       key: 'srNo',
       render: (_, __, index) => index + 1,
       width: '8%',
@@ -45,16 +55,20 @@ const LocationList = () => {
     form.resetFields();
   };
 
-  const onFinish = (values) => {
-    const newLocation = {
-      key: (dataSource.length + 1).toString(),
+  const handleAddLocation = async (values) => {
+    const payload = {
       address: values.address,
       state: values.state,
       city: values.city,
     };
-    setDataSource([...dataSource, newLocation]);
-    setIsModalVisible(false);
-    form.resetFields();
+
+    try {
+      await dispatch(addLocation(payload)).unwrap(); // dispatch Redux action
+      form.resetFields(); // clear form
+      setIsModalVisible(false); // close modal
+    } catch (err) {
+      console.error('Failed to add location:', err);
+    }
   };
 
   return (
@@ -97,6 +111,10 @@ const LocationList = () => {
         </Col>
       </Row>
 
+      {error && (
+        <Alert message="Error" description={error} type="error" showIcon style={{ marginBottom: 20 }} />
+      )}
+
       <div
         style={{
           background: '#ffffff',
@@ -106,21 +124,23 @@ const LocationList = () => {
           overflowX: 'auto',
         }}
       >
-        <Table
-          dataSource={filteredData}
-          columns={columns}
-          pagination={{ pageSize: 10 }}
-          bordered
-          size="small"
-          scroll={{ x: 'max-content' }}
-        />
+        <Spin spinning={loading}>
+          <Table
+            dataSource={filteredData}
+            columns={columns}
+            pagination={{ pageSize: 10 }}
+            bordered
+            size="small"
+            rowKey="id"
+            scroll={{ x: 'max-content' }}
+          />
+        </Spin>
       </div>
 
-      {/* Use the separated modal component */}
       <AddLocationModal
         visible={isModalVisible}
         onCancel={handleCancel}
-        onFinish={onFinish}
+        onFinish={handleAddLocation}
         form={form}
         states={states}
         cities={cities}

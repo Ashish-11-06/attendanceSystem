@@ -3,14 +3,15 @@ import { Modal, Form, Input, Select, Row, Col, Button } from 'antd';
 
 const { Option } = Select;
 
+
 const AddLocationModal = ({ visible, onCancel, onFinish, form, states, cities }) => {
   return (
     <Modal
       title="Add New Location"
-      visible={visible}
+      open ={visible}
       onCancel={onCancel}
       footer={null}
-      destroyOnClose
+      // destroyOnClose
       centered
     >
       <Form form={form} layout="vertical" onFinish={onFinish}>
@@ -72,7 +73,7 @@ const AddLocationModal = ({ visible, onCancel, onFinish, form, states, cities })
               <Button onClick={onCancel}>Cancel</Button>
             </Col>
             <Col>
-              <Button type="primary" htmlType="submit">
+              <Button type="primary" htmlType="submit" >
                 Add Location
               </Button>
             </Col>
