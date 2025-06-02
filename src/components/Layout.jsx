@@ -90,7 +90,7 @@ const AppLayout = ({ children }) => {
               userSelect: 'none',
             }}
           >
-            {collapsed ? '🚀' : 'My Dashboard'}
+            {collapsed ? '🚀' : 'Attendance'}
           </div>
           {SidebarMenu}
         </Sider>
@@ -122,7 +122,7 @@ const AppLayout = ({ children }) => {
               userSelect: 'none',
             }}
           >
-            🚀 My Dashboard
+            Attendance
           </div>
           {SidebarMenu}
         </Drawer>
@@ -173,8 +173,8 @@ const AppLayout = ({ children }) => {
 
         <Content
           style={{
-            margin: '24px 16px',
-            padding: 24,
+            margin: '10px',
+            // padding: 24,
             minHeight: 280,
             background: '#fff',
             borderRadius: 12,
