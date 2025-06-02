@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Table, Input, Row, Col, Button, Modal, Form, Select } from 'antd';
-import { SearchOutlined, PlusOutlined } from '@ant-design/icons'; // Added PlusOutlined
+import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
 
@@ -69,7 +69,7 @@ const LocationList = () => {
         </Col>
       </Row>
 
-      {/* Search and Add Button - Styled like UnitList */}
+      {/* Search and Add Button */}
       <Row justify="space-between" align="middle" gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col xs={24} sm={18} md={16} lg={12} xl={10}>
           <Input
@@ -184,8 +184,8 @@ const LocationList = () => {
             </Select>
           </Form.Item>
 
-          <Form.Item>
-            <Row justify="end" gutter={16}>
+          <Form.Item style={{ marginTop: 24 }}>
+            <Row justify="center" gutter={16}>
               <Col>
                 <Button onClick={handleCancel}>Cancel</Button>
               </Col>

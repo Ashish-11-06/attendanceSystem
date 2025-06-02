@@ -9,7 +9,7 @@ import {
   Select,
   TimePicker,
 } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 
 const { Option } = Select;
@@ -145,6 +145,7 @@ const EventList = () => {
         <Button
           type="primary"
           size="large"
+          icon={<PlusOutlined />}
           style={{
             fontSize: 16,
             padding: '10px 30px',

@@ -48,7 +48,6 @@ const UnitList = () => {
     form.resetFields();
     setIsModalOpen(false);
 
-    // Show success message
     setTimeout(() => {
       message.success('Unit added successfully!');
     }, 200);
@@ -58,7 +57,6 @@ const UnitList = () => {
     <div style={{ padding: 20, background: '#f4f7fa', minHeight: '100vh' }}>
       <h1 style={{ marginBottom: 30 }}>Unit List</h1>
 
-      {/* Search and Add Button */}
       <Row justify="space-between" align="middle" gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col xs={24} sm={18} md={16} lg={12} xl={10}>
           <Input
@@ -91,7 +89,6 @@ const UnitList = () => {
         </Col>
       </Row>
 
-      {/* Table */}
       <div
         style={{
           background: '#ffffff',
@@ -110,11 +107,13 @@ const UnitList = () => {
         />
       </div>
 
-      {/* Modal for Adding Unit */}
       <Modal
         title="Add New Unit"
         open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
+        onCancel={() => {
+          setIsModalOpen(false);
+          form.resetFields();
+        }}
         footer={null}
         destroyOnClose
       >
@@ -165,16 +164,33 @@ const UnitList = () => {
           <Form.Item name="phone" label="Phone (optional)">
             <Input />
           </Form.Item>
+<Form.Item>
+  <div
+    style={{
+      display: 'flex',
+      justifyContent: 'center',
+      gap: 16,
+      marginTop: 24,
+    }}
+  >
+    <Button
+    
+      onClick={() => {
+        setIsModalOpen(false);
+        form.resetFields();
+      }}
+    >
+      Cancel
+    </Button>
+    <Button
+      type="primary"
+      htmlType="submit"
+    >
+      Add Unit
+    </Button>
+  </div>
+</Form.Item>
 
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              style={{ width: '100%' }}
-            >
-              Add Unit
-            </Button>
-          </Form.Item>
         </Form>
       </Modal>
     </div>
