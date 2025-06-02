@@ -1,10 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit';
 import eventReducer from './Slices/EventSlice';
 import locationReducer from './Slices/locationSlice';
+import unitReducer from './Slices/UnitSlice';
+import volinteerReducer from './Slices/VolinteerSlice';
 
 export const store = configureStore({
   reducer: {
     events: eventReducer,
     locations: locationReducer, 
+    units: unitReducer,
+    volinteers: volinteerReducer,
   },
 });
