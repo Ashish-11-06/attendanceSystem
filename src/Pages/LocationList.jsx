@@ -62,10 +62,12 @@ const filteredData = locations.filter(({ address, state, city }) => {
       city: values.city,
     };
 
+
+
     try {
-      await dispatch(addLocation(payload)).unwrap(); // dispatch Redux action
-      form.resetFields(); // clear form
-      setIsModalVisible(false); // close modal
+      await dispatch(addLocation(payload)).unwrap(); 
+      form.resetFields(); 
+      setIsModalVisible(false); 
     } catch (err) {
       console.error('Failed to add location:', err);
     }
@@ -140,7 +142,10 @@ const filteredData = locations.filter(({ address, state, city }) => {
       <AddLocationModal
         visible={isModalVisible}
         onCancel={handleCancel}
-        onFinish={handleAddLocation}
+         onFinish={async (values) => {
+              await handleAddLocation(values); 
+                dispatch(fetchAllLocations());   
+              }}
         form={form}
         states={states}
         cities={cities}

@@ -27,6 +27,7 @@ export const addLocation = createAsyncThunk(
   }
 );
 
+
 const locationSlice = createSlice({
   name: 'locations',
   initialState: {
