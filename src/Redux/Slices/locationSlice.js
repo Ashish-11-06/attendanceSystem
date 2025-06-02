@@ -15,11 +15,11 @@ export const fetchAllLocations = createAsyncThunk(
 );
 
 // Thunk to add a new event
-export const addEvent = createAsyncThunk(
-  'locations/addEvent',
-  async (newEvent, thunkAPI) => {
+export const addLocation = createAsyncThunk(
+  'locations/addLocation',
+  async (newLocation, thunkAPI) => {
     try {
-      const response = await locationAPIs.addEvent(newEvent);
+      const response = await locationAPIs.addLocation(newLocation);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data || error.message);
@@ -52,15 +52,15 @@ const locationSlice = createSlice({
         state.error = action.payload;
       })
     //   ----------------------------------------
-       .addCase(addEvent.pending, (state) => {
+       .addCase(addLocation.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(addEvent.fulfilled, (state, action) => {
+      .addCase(addLocation.fulfilled, (state, action) => {
         state.loading = false;
         state.locations.push(action.payload); 
       })
-      .addCase(addEvent.rejected, (state, action) => {
+      .addCase(addLocation.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
