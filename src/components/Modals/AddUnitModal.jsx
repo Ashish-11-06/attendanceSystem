@@ -1,11 +1,32 @@
 // src/Models/AddUnitModal.jsx
 
 import React from 'react';
-import { Modal, Form, Input, Select, Button } from 'antd';
+import { Modal, Form, Input, Select, Button, message } from 'antd';
+import { addUnit } from '../../Redux/Slices/UnitSlice';
+import { useDispatch } from 'react-redux';
 
 const { Option } = Select;
 
-const AddUnitModal = ({ open, onCancel, onFinish, form }) => {
+const AddUnitModal = ({ open, onCancel, form }) => {
+const dispatch = useDispatch();
+  
+    const onFinish = async (values) => {
+    try {
+      const result = await dispatch(addUnit(values));
+      if (addUnit.fulfilled.match(result)) {
+        message.success('Unit added successfully!');
+        form.resetFields();
+        onCancel();
+      } else {
+        throw new Error(result.payload || 'Failed to add unit');
+      }
+    } catch (error) {
+      message.error(error.message || 'Error adding unit');
+    }
+  };
+
+
+
   return (
     <Modal
       title="Add New Unit"
@@ -18,9 +39,17 @@ const AddUnitModal = ({ open, onCancel, onFinish, form }) => {
       destroyOnClose
     >
       <Form form={form} layout="vertical" onFinish={onFinish} autoComplete="off">
+         <Form.Item
+          name="unit_id"
+          label="Unit ID"
+          rules={[{ required: true, message: 'Please enter name' }]}
+        >
+          <Input />
+        </Form.Item>
+
         <Form.Item
-          name="name"
-          label="Name"
+          name="unit_name"
+          label="Unit Name"
           rules={[{ required: true, message: 'Please enter name' }]}
         >
           <Input />
@@ -36,20 +65,10 @@ const AddUnitModal = ({ open, onCancel, onFinish, form }) => {
 
         <Form.Item
           name="location"
-          label="Location"
+          label="Address"
           rules={[{ required: true, message: 'Please select location' }]}
         >
-          <Select
-            showSearch
-            placeholder="Select location"
-            optionFilterProp="children"
-            filterOption={(input, option) =>
-              option?.children?.toLowerCase().includes(input.toLowerCase())
-            }
-          >
-            <Option value="Pune">Pune</Option>
-            <Option value="Mumbai">Mumbai</Option>
-          </Select>
+          <Input />
         </Form.Item>
 
         <Form.Item name="email" label="Email (optional)">
