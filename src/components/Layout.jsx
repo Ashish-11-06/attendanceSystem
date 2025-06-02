@@ -9,7 +9,7 @@ import {
   UsergroupAddOutlined,
   EnvironmentOutlined,
   SmileOutlined,
-  UserOutlined, 
+  UserOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -28,33 +28,58 @@ const AppLayout = ({ children }) => {
     { key: '/unit-list', icon: <ApartmentOutlined />, label: 'Unit List' },
     { key: '/volunteer-list', icon: <UsergroupAddOutlined />, label: 'Volunteer List' },
     { key: '/location-list', icon: <EnvironmentOutlined />, label: 'Location List' },
-    { key: '/profile', icon: <UserOutlined />, label: 'Profile' },
   ];
 
+  const profileMenuItem = { key: '/profile', icon: <UserOutlined />, label: 'Profile' };
+
+  const onMenuClick = ({ key }) => {
+    navigate(key);
+    if (isMobile) {
+      setCollapsed(true);
+    }
+  };
+
   const SidebarMenu = (
-    <Menu
-      theme="dark"
-      mode="inline"
-      selectedKeys={[location.pathname]}
-      onClick={({ key }) => {
-        navigate(key);
-        if (isMobile) {
-          setCollapsed(true); // close drawer on mobile after click
-        }
-      }}
-      items={menuItems}
+    <div
       style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: 'calc(100vh - 64px)', // Full height minus header/logo height
+        justifyContent: isMobile ? 'flex-start' : 'space-between',
         paddingTop: 16,
-        height: '100%',
-        borderRight: 0,
+        paddingBottom: 16,
         overflow: 'hidden',
       }}
-    />
+    >
+      <Menu
+        theme="dark"
+        mode="inline"
+        selectedKeys={[location.pathname]}
+        onClick={onMenuClick}
+        items={menuItems}
+        style={{
+          borderRight: 0,
+          marginBottom: 0,
+        }}
+      />
+
+      {/* Add extra margin-top on mobile to push profile menu down */}
+      <Menu
+        theme="dark"
+        mode="inline"
+        selectedKeys={[location.pathname]}
+        onClick={onMenuClick}
+        items={[profileMenuItem]}
+        style={{
+          borderRight: 0,
+          marginTop: isMobile ? 380 : 0,  // <-- Increase this value to push profile lower on mobile
+        }}
+      />
+    </div>
   );
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      {/* Desktop Sidebar */}
       {!isMobile && (
         <Sider
           trigger={null}
@@ -96,7 +121,6 @@ const AppLayout = ({ children }) => {
         </Sider>
       )}
 
-      {/* Mobile Sidebar Drawer */}
       {isMobile && (
         <Drawer
           placement="left"
@@ -128,7 +152,6 @@ const AppLayout = ({ children }) => {
         </Drawer>
       )}
 
-      {/* Main Layout */}
       <Layout
         style={{
           marginLeft: !isMobile ? (collapsed ? 80 : SIDEBAR_WIDTH) : 0,
@@ -160,7 +183,7 @@ const AppLayout = ({ children }) => {
             <Breadcrumb>
               <Breadcrumb.Item>Home</Breadcrumb.Item>
               <Breadcrumb.Item>
-                {menuItems.find((item) => item.key === location.pathname)?.label || 'Page'}
+                {[...menuItems, profileMenuItem].find((item) => item.key === location.pathname)?.label || 'Page'}
               </Breadcrumb.Item>
             </Breadcrumb>
           </div>
