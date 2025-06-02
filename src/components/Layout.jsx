@@ -10,6 +10,7 @@ import {
   EnvironmentOutlined,
   SmileOutlined,
   UserOutlined,
+  UnderlineOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -28,6 +29,8 @@ const AppLayout = ({ children }) => {
     { key: '/unit-list', icon: <ApartmentOutlined />, label: 'Unit List' },
     { key: '/volunteer-list', icon: <UsergroupAddOutlined />, label: 'Volunteer List' },
     { key: '/location-list', icon: <EnvironmentOutlined />, label: 'Location List' },
+    { key: '/attendance', icon: <CalendarOutlined />, label: 'Mark Attendance' }, 
+    { key: '/attendance-list', icon: <UnderlineOutlined />, label: 'Attendance List' },
   ];
 
   const profileMenuItem = { key: '/profile', icon: <UserOutlined />, label: 'Profile' };
@@ -181,7 +184,7 @@ const AppLayout = ({ children }) => {
               style: { fontSize: 20, cursor: 'pointer', marginRight: 16 },
             })}
             <Breadcrumb>
-              <Breadcrumb.Item>Home</Breadcrumb.Item>
+               <Breadcrumb.Item>...</Breadcrumb.Item> 
               <Breadcrumb.Item>
                 {[...menuItems, profileMenuItem].find((item) => item.key === location.pathname)?.label || 'Page'}
               </Breadcrumb.Item>

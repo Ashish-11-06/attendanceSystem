@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Table, Input, Row, Col, Button, Modal, Form, Select } from 'antd';
+import { Table, Input, Row, Col, Button, Form } from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
+import AddLocationModal from '../components/Modals/AddLocationModal';
 
-const { Option } = Select;
 
 const LocationList = () => {
   const [searchText, setSearchText] = useState('');
@@ -10,7 +10,6 @@ const LocationList = () => {
     { key: '1', address: '123 Main St', state: 'California', city: 'Los Angeles' },
     { key: '2', address: '456 Oak Ave', state: 'Texas', city: 'Austin' },
   ]);
-
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
 
@@ -39,9 +38,7 @@ const LocationList = () => {
     { title: 'City', dataIndex: 'city', key: 'city', width: '26%' },
   ];
 
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
+  const showModal = () => setIsModalVisible(true);
 
   const handleCancel = () => {
     setIsModalVisible(false);
@@ -62,14 +59,12 @@ const LocationList = () => {
 
   return (
     <div style={{ padding: 30, background: '#f4f7fa', minHeight: '100vh' }}>
-      {/* Heading */}
       <Row style={{ marginBottom: 16 }}>
         <Col>
           <h1 style={{ margin: 0 }}>Location List</h1>
         </Col>
       </Row>
 
-      {/* Search and Add Button */}
       <Row justify="space-between" align="middle" gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col xs={24} sm={18} md={16} lg={12} xl={10}>
           <Input
@@ -102,7 +97,6 @@ const LocationList = () => {
         </Col>
       </Row>
 
-      {/* Table Display */}
       <div
         style={{
           background: '#ffffff',
@@ -122,82 +116,15 @@ const LocationList = () => {
         />
       </div>
 
-      {/* Add Location Modal */}
-      <Modal
-        title="Add New Location"
+      {/* Use the separated modal component */}
+      <AddLocationModal
         visible={isModalVisible}
         onCancel={handleCancel}
-        footer={null}
-        destroyOnClose
-        centered
-      >
-        <Form form={form} layout="vertical" onFinish={onFinish}>
-          <Form.Item
-            label="Address"
-            name="address"
-            rules={[{ required: true, message: 'Please enter the address' }]}
-          >
-            <Input placeholder="Enter address" />
-          </Form.Item>
-
-          <Form.Item
-            label="State"
-            name="state"
-            rules={[{ required: true, message: 'Please select the state' }]}
-          >
-            <Select
-              placeholder="Select state"
-              showSearch
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                option.children.toLowerCase().includes(input.toLowerCase())
-              }
-              allowClear
-            >
-              {states.map((state) => (
-                <Option key={state} value={state}>
-                  {state}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          <Form.Item
-            label="City"
-            name="city"
-            rules={[{ required: true, message: 'Please select the city' }]}
-          >
-            <Select
-              placeholder="Select city"
-              showSearch
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                option.children.toLowerCase().includes(input.toLowerCase())
-              }
-              allowClear
-            >
-              {cities.map((city) => (
-                <Option key={city} value={city}>
-                  {city}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          <Form.Item style={{ marginTop: 24 }}>
-            <Row justify="center" gutter={16}>
-              <Col>
-                <Button onClick={handleCancel}>Cancel</Button>
-              </Col>
-              <Col>
-                <Button type="primary" htmlType="submit">
-                  Add Location
-                </Button>
-              </Col>
-            </Row>
-          </Form.Item>
-        </Form>
-      </Modal>
+        onFinish={onFinish}
+        form={form}
+        states={states}
+        cities={cities}
+      />
     </div>
   );
 };
