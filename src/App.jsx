@@ -10,6 +10,8 @@ import UnitList from './Pages/UnitList';
 import VolunteerList from './Pages/VolunteerList';
 import LocationList from './Pages/LocationList';
 import Profile from './Pages/Profile';
+import Attendance from './Pages/Attendance';
+import Attendance_list from './Pages/Attendance_list';
 
 function App() {
   return (
@@ -21,6 +23,8 @@ function App() {
           <Route path="/unit-list" element={<UnitList />} />
           <Route path="/volunteer-list" element={<VolunteerList />} />
           <Route path="/location-list" element={<LocationList />} />
+          <Route path="/attendance" element={<Attendance/>} />
+          <Route path="/attendance-list" element={<Attendance_list />} />
           <Route path="/profile" element={<Profile />} />
         </Routes>
       </AppLayout>
