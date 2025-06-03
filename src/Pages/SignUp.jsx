@@ -125,7 +125,7 @@ const Signup = () => {
                 level={2}
                 style={{ textAlign: 'center', marginBottom: 24, color: '#1890ff' }}
               >
-                Sign Up
+                Sign Up for Unit
               </Title>
 
               <Form
@@ -136,11 +136,11 @@ const Signup = () => {
                 autoComplete="off"
               >
                 <Form.Item
-                  label="Full Name"
+                  label="Unit Name"
                   name="name"
                   rules={[{ required: true, message: 'Please enter your name!' }]}
                 >
-                  <Input placeholder="Enter your full name" />
+                  <Input placeholder="Enter your unit name" />
                 </Form.Item>
 
                 <Form.Item
@@ -183,7 +183,7 @@ const Signup = () => {
                   <Input.Password placeholder="Confirm your password" />
                 </Form.Item>
 
-                <Form.Item
+                {/* <Form.Item
                   label="Select User Type"
                   name="userType"
                   rules={[{ required: true, message: 'Please select user type!' }]}
@@ -192,7 +192,7 @@ const Signup = () => {
                     <Option value="admin">Admin</Option>
                     <Option value="unit">Unit</Option>
                   </Select>
-                </Form.Item>
+                </Form.Item> */}
 
                 <Form.Item style={{ marginBottom: 0 }}>
                   <Button

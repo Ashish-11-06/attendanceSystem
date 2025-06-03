@@ -12,6 +12,7 @@ import {
   Col,
 } from 'antd';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 const { Title, Text } = Typography;
 
@@ -86,10 +87,14 @@ const AnimatedTypingWithSlogan = () => {
 
 const Login = () => {
   const [form] = Form.useForm();
+  const navigate = useNavigate();
 
-  const onFinish = (values) => {
+ const onFinish = (values) => {
     console.log('Login success:', values);
     message.success('Login successful!');
+    
+
+    navigate('/');
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -199,11 +204,11 @@ const Login = () => {
                 </div>
                 </Form.Item>
 
-                <div style={{ textAlign: 'right', marginBottom: 16 }}>
+                {/* <div style={{ textAlign: 'right', marginBottom: 16 }}>
                   <a href="#" style={{ color: '#1890ff' }}>
                     Forgot password?
                   </a>
-                </div>
+                </div> */}
 
                 <Form.Item style={{ marginBottom: 0 }}>
                   <Button

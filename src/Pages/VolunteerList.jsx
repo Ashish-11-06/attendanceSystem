@@ -145,7 +145,7 @@ const VolunteerList = () => {
             <Input
               placeholder="Search by name, phone, or email"
               allowClear
-              size="large"
+              // size="large"
               prefix={<SearchOutlined style={{ color: '#999' }} />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
@@ -155,7 +155,7 @@ const VolunteerList = () => {
           <Col xs={12} sm={6} md={6} lg={4} xl={3}>
             <Button
               type="primary"
-              size="large"
+              // size="large"
               icon={<PlusOutlined />}
               className="addVolunteerBtn"
               onClick={showModal}

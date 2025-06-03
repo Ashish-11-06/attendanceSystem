@@ -86,7 +86,7 @@ const filteredData = locations.filter(({ address, state, city }) => {
           <Input
             placeholder="Search by address, state or city"
             allowClear
-            size="large"
+            // size="large"
             prefix={<SearchOutlined style={{ color: '#999' }} />}
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
@@ -96,7 +96,7 @@ const filteredData = locations.filter(({ address, state, city }) => {
         <Col>
           <Button
             type="primary"
-            size="large"
+            // size="large"
             icon={<PlusOutlined />}
             onClick={showModal}
             style={{
