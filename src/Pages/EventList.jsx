@@ -39,6 +39,12 @@ const EventList = () => {
     }
   }, [error]);
 
+    const [pagination, setPagination] = useState({
+      current: 1,
+      pageSize: 10,
+    });
+  
+
   // 🔍 Filter events
   const filteredData = events.filter(({ event_name,location, date }) => {
     const matchesText =
@@ -59,7 +65,7 @@ const EventList = () => {
       title: 'Sr. No.',
       dataIndex: 'key',
       key: 'srNo',
-      render: (text, record, index) => index + 1,
+      render: (_, __, index) => (pagination.current - 1) * pagination.pageSize + index + 1,
       width: 80,
     },
     {
@@ -177,18 +183,30 @@ const EventList = () => {
       >
         {/* {loading ? ( */}
         <Spin spinning={loading} size='large' tip="Loading Events...">
-        {/* // ) : ( */}
+     
           <Table
-            dataSource={filteredData}
-            columns={columns}
-            pagination={{ pageSize: 10 }}
-            bordered
-            size="small"
-            scroll={{ x: 'max-content' }}
-            rowKey="id"
-          />
+              dataSource={filteredData}
+              columns={columns}
+              pagination={{
+                current: pagination.current,
+                pageSize: pagination.pageSize,
+                total: filteredData.length,
+                showSizeChanger: false,
+              }}
+              onChange={(paginationInfo) => {
+                setPagination({
+                  ...pagination,
+                  current: paginationInfo.current,
+                });
+              }}
+              bordered
+              size="small"
+              scroll={{ x: 'max-content' }}
+              rowKey={(record, index) => index}
+            />
+
           </Spin>
-        {/* )} */}
+        
       </div>
 
       <AddEventModal

@@ -141,7 +141,7 @@ const LocationList = () => {
             onChange={(pagination) => setPagination(pagination)}
             bordered
             size="small"
-            rowKey="id"
+            rowKey="key"
             scroll={{ x: 'max-content' }}
           />
         </Spin>

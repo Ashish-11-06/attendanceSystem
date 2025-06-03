@@ -12,8 +12,6 @@ const VolunteerList = () => {
   const [searchText, setSearchText] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
-
-  // Local state for volunteers so we can add new one without reload
   const [localVolunteers, setLocalVolunteers] = useState([]);
 
   useEffect(() => {
@@ -26,7 +24,6 @@ const VolunteerList = () => {
     }
   }, [error]);
 
-  // Sync redux volinteers to local state (only on initial load)
   useEffect(() => {
     setLocalVolunteers(volinteers);
   }, [volinteers]);
@@ -50,37 +47,31 @@ const VolunteerList = () => {
       dataIndex: 'key',
       key: 'srNo',
       render: (_, __, index) => (pagination.current - 1) * pagination.pageSize + index + 1,
-      fixed: 'left',
-      width: 70,
     },
-    { title: 'Volunteer ID', dataIndex: 'volunteer_id', key: 'volunteer_id', width: 150 },
-    { title: 'Name', dataIndex: 'name', key: 'name', width: 150 },
-    { title: 'Gender', dataIndex: 'gender', key: 'gender', width: 100 },
+    { title: 'Volunteer ID', dataIndex: 'volunteer_id', key: 'volunteer_id' },
+    { title: 'Name', dataIndex: 'name', key: 'name' },
+    { title: 'Gender', dataIndex: 'gender', key: 'gender' },
     {
       title: 'Phone Number',
       dataIndex: 'phone',
       key: 'phone',
       render: (text) => text || '-',
-      width: 130,
     },
     {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',
       render: (text) => text || '-',
-      width: 200,
     },
     {
       title: 'Old P. No.',
       dataIndex: 'old_personal_number',
       key: 'oldPersonalNumber',
-      width: 150,
     },
     {
       title: 'New P. No.',
       dataIndex: 'new_personal_number',
       key: 'newPersonalNumber',
-      width: 150,
     },
   ];
 
@@ -93,9 +84,7 @@ const VolunteerList = () => {
   };
 
   const handleAddVolunteer = (values) => {
-    // Create a new volunteer ID - generate unique or increment logic here
-    const newVolunteerId = `V${localVolunteers.length + 1}`; 
-
+    const newVolunteerId = `V${localVolunteers.length + 1}`;
     const newVolunteer = {
       key: (localVolunteers.length + 1).toString(),
       volunteer_id: newVolunteerId,
@@ -107,101 +96,77 @@ const VolunteerList = () => {
   };
 
   return (
-    <>
-      <style>
-        {`
-          .addVolunteerBtn {
-            font-size: 14px;
-            padding: 6px 16px;
-            background: #3f87f5;
-            border-color: #3f87f5;
-            border-radius: 6px;
-            box-shadow: 0 3px 10px rgba(63, 135, 245, 0.3);
-          }
+    <div
+      style={{
+        padding: 20,
+        background: '#f4f7fa',
+        minHeight: '100vh',
+        boxSizing: 'border-box',
+      }}
+    >
+      <h1 style={{ marginBottom: 20 }}>Volunteer List</h1>
 
-          @media (max-width: 576px) {
-            .addVolunteerBtn {
-              margin-left: 0 !important;
-              width: auto !important;
-              display: inline-block;
-            }
-          }
-        `}
-      </style>
+      <Row gutter={[16, 16]} justify="space-between" style={{ marginBottom: 16 }}>
+        <Col xs={24} sm={18}>
+          <Input
+            placeholder="Search by name, phone, or email"
+            allowClear
+            prefix={<SearchOutlined style={{ color: '#999' }} />}
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            style={{ width: '55%' }}
+          />
+        </Col>
+        <Col xs={24} sm={6}>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={showModal}
+            block
+            style={{
+              fontSize: 16,
+              padding: '10px 30px',
+              background: '#3f87f5',
+              borderColor: '#3f87f5',
+              borderRadius: 6,
+              boxShadow: '0 3px 10px rgba(63, 135, 245, 0.3)',
+              width: '50%',
+            }}
+          >
+            Add Volunteer
+          </Button>
+        </Col>
+      </Row>
 
-      <div
-        style={{
-          padding: 20,
-          background: '#f4f7fa',
-          minHeight: '100vh',
-          boxSizing: 'border-box',
-        }}
-      >
-        <h1 style={{ marginBottom: 30, textAlign: 'left' }}>Volunteer List</h1>
-
-        <Row justify="space-between" align="middle" gutter={[16, 16]} style={{ marginBottom: 24 }}>
-          <Col xs={24} sm={18} md={16} lg={12} xl={10}>
-            <Input
-              placeholder="Search by name, phone, or email"
-              allowClear
-              prefix={<SearchOutlined style={{ color: '#999' }} />}
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              style={{ width: '100%' }}
-            />
-          </Col>
-          <Col xs={12} sm={6} md={6} lg={4} xl={3}>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              className="addVolunteerBtn"
-              onClick={showModal}
-              block={false}
-            >
-              Add Volunteer
-            </Button>
-          </Col>
-        </Row>
-
+      <Spin spinning={loading} tip="Loading Volunteers...">
         <div
           style={{
+            background: '#fff',
+            padding: 12,
             borderRadius: 12,
-            boxShadow: '0 8px 20px rgba(0, 0, 0, 0.05)',
             overflowX: 'auto',
           }}
         >
-          <Spin spinning={loading} tip="Loading Volunteers...">
-            <div
-              style={{
-                background: '#ffffff',
-                padding: 16,
-                borderRadius: 12,
-                boxShadow: '0 8px 20px rgba(0, 0, 0, 0.05)',
-                overflowX: 'auto',
-              }}
-            >
-              <Table
-                dataSource={filteredData}
-                columns={columns}
-                size="small"
-                pagination={{
-                  current: pagination.current,
-                  pageSize: pagination.pageSize,
-                  total: filteredData.length,
-                  showSizeChanger: false,
-                }}
-                onChange={(pagination) => setPagination(pagination)}
-                rowKey="key"
-                bordered
-                scroll={{ x: 900 }}
-              />
-            </div>
-          </Spin>
+          <Table
+            dataSource={filteredData}
+            columns={columns}
+            pagination={{
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              total: filteredData.length,
+              showSizeChanger: false,
+            }}
+            onChange={(pagination) => setPagination(pagination)}
+            rowKey="key"
+            bordered
+            scroll={{ x: 'max-content' }}
+            size="middle"
+          />
         </div>
+      </Spin>
 
-        <AddVolunteerModal visible={isModalVisible} onCancel={handleCancel} onAdd={handleAddVolunteer} />
-      </div>
-    </>
+      <AddVolunteerModal visible={isModalVisible} onCancel={handleCancel} onAdd={handleAddVolunteer} />
+    </div>
   );
 };
 

@@ -24,10 +24,11 @@ const UnitList = () => {
   const [form] = Form.useForm();
 
   const { units, loading, error } = useSelector((state) => state.units);
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 10,
-  });
+const [pagination, setPagination] = useState({
+      current: 1,
+      pageSize: 10,
+    });
+  
 
    useEffect(() => {
       dispatch(fetchAllUnits());
@@ -54,12 +55,12 @@ const UnitList = () => {
 
   // Define table columns
   const columns = [
-    // {
-    //   title: 'Sr. No.',
-    //   key: 'srNo',
-    //   render: (_, __, index) => (pagination.current - 1) * pagination.pageSize + index + 1,
-    //   width: 80,
-    // },
+    {
+      title: 'Sr. No.',
+      key: 'srNo',
+      render: (_, __, index) => (pagination.current - 1) * pagination.pageSize + index + 1,
+      width: 80,
+    },
      {
       title: 'Unit ID',
       dataIndex: 'unit_id',
@@ -151,17 +152,29 @@ const UnitList = () => {
            {/* {loading ? ( */}
            <Spin spinning={loading} size='large' tip="Loading Events...">
            {/* // ) : ( */}
-             <Table
-               dataSource={filteredData}
-               columns={columns}
-               pagination={{ pageSize: 10 }}
-               bordered
-               size="small"
-               scroll={{ x: 'max-content' }}
-               rowKey="id"
-             />
+             
+<Table
+  dataSource={filteredData}
+  columns={columns}
+  pagination={{
+    ...pagination,
+    total: filteredData.length,
+    showSizeChanger: false,
+    // pageSizeOptions: ['5', '10', '20', '50'],
+  }}
+  onChange={(paginationInfo) => {
+    setPagination({
+      current: paginationInfo.current,
+      pageSize: paginationInfo.pageSize,
+    });
+  }}
+  bordered
+  size="small"
+  scroll={{ x: 'max-content' }}
+  rowKey="id"
+/>
              </Spin>
-           {/* )} */}
+        
          </div>
 
       <AddUnitModal

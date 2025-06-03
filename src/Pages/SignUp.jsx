@@ -1,19 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Form,
   Input,
   Button,
   Typography,
   Card,
-  Select,
   message,
   Row,
   Col,
 } from 'antd';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import authAPIs from "../Redux/Api/authApi";
+
 
 const { Title, Text } = Typography;
-const { Option } = Select;
 
 const AnimatedTypingWithSlogan = () => {
   return (
@@ -85,10 +86,23 @@ const AnimatedTypingWithSlogan = () => {
 
 const Signup = () => {
   const [form] = Form.useForm();
+  const [otpVisible, setOtpVisible] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(false);
+  const navigate = useNavigate();
 
-  const onFinish = (values) => {
-    console.log('Signup success:', values);
-    message.success('Account created successfully!');
+  const onFinish = async (values) => {
+    try {
+      const response = await authAPIs.register({
+        email: values.email,
+        password: values.password,
+        unit_name: values.name,
+      });
+
+      message.success('Registered successfully! OTP sent to your email.');
+      setOtpVisible(true);
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Failed to register.');
+    }
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -96,15 +110,44 @@ const Signup = () => {
     message.error('Please check the form fields and try again.');
   };
 
+  const handleOtpVerification = async () => {
+    const email = form.getFieldValue('email');
+    const otp = form.getFieldValue('otp');
+
+    if (!otp || otp.length !== 6) {
+      message.error('Please enter a valid 6-digit OTP.');
+      return;
+    }
+
+    try {
+      const response = await authAPIs.verifyOtp({ email, otp });
+
+      if (response.data.success === false) {
+        throw new Error(response.data.message || 'Invalid OTP, please try again.');
+      }
+
+      message.success('OTP verified successfully! Redirecting to login...');
+      setOtpVerified(true);
+
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Failed to verify OTP.');
+    }
+  };
+
   return (
     <div style={{ minHeight: '92vh', background: '#f0f2f5', padding: '20px' }}>
       <Row justify="center" align="middle" gutter={[32, 32]}>
-        {/* Left Side Content */}
-        <Col xs={24} md={12} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <Col
+          xs={24}
+          md={12}
+          style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+        >
           <AnimatedTypingWithSlogan />
         </Col>
 
-        {/* Right Side Form */}
         <Col xs={24} md={12} style={{ display: 'flex', justifyContent: 'center' }}>
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -121,10 +164,7 @@ const Signup = () => {
                 border: '1px solid #ddd',
               }}
             >
-              <Title
-                level={2}
-                style={{ textAlign: 'center', marginBottom: 24, color: '#1890ff' }}
-              >
+              <Title level={2} style={{ textAlign: 'center', marginBottom: 24, color: '#1890ff' }}>
                 Sign Up for Unit
               </Title>
 
@@ -175,24 +215,13 @@ const Signup = () => {
                         if (!value || getFieldValue('password') === value) {
                           return Promise.resolve();
                         }
-                        return Promise.reject('Passwords do not match!');
+                        return Promise.reject(new Error('Passwords do not match!'));
                       },
                     }),
                   ]}
                 >
                   <Input.Password placeholder="Confirm your password" />
                 </Form.Item>
-
-                {/* <Form.Item
-                  label="Select User Type"
-                  name="userType"
-                  rules={[{ required: true, message: 'Please select user type!' }]}
-                >
-                  <Select placeholder="Select a user type">
-                    <Option value="admin">Admin</Option>
-                    <Option value="unit">Unit</Option>
-                  </Select>
-                </Form.Item> */}
 
                 <Form.Item style={{ marginBottom: 0 }}>
                   <Button
@@ -207,10 +236,38 @@ const Signup = () => {
                       background: 'linear-gradient(135deg, #36D1DC, #5B86E5)',
                       border: 'none',
                     }}
+                    disabled={otpVisible}
                   >
                     Sign Up
                   </Button>
                 </Form.Item>
+
+                {otpVisible && (
+                  <Form.Item label="OTP" required>
+                    <Input.Group compact>
+                      <Form.Item
+                        name="otp"
+                        noStyle
+                        rules={[{ required: true, message: 'Please enter the OTP!' }]}
+                      >
+                        <Input
+                          placeholder="Enter OTP"
+                          style={{ width: '70%' }}
+                          disabled={otpVerified}
+                        />
+                      </Form.Item>
+
+                      <Button
+                        type={otpVerified ? 'default' : 'primary'}
+                        onClick={handleOtpVerification}
+                        style={{ width: '30%' }}
+                        disabled={otpVerified}
+                      >
+                        {otpVerified ? 'Verified' : 'Verify OTP'}
+                      </Button>
+                    </Input.Group>
+                  </Form.Item>
+                )}
 
                 <div style={{ textAlign: 'center', marginTop: 16 }}>
                   <Text type="secondary">Already have an account?</Text>{' '}

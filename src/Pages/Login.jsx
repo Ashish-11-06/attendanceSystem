@@ -1,5 +1,5 @@
 // src/Pages/Login.jsx
-import React from 'react';
+import React from "react";
 import {
   Form,
   Input,
@@ -10,9 +10,10 @@ import {
   message,
   Row,
   Col,
-} from 'antd';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+} from "antd";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import authAPIs from "../Redux/Api/authApi"; 
 
 const { Title, Text } = Typography;
 
@@ -20,28 +21,28 @@ const AnimatedTypingWithSlogan = () => {
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
+        display: "flex",
+        flexDirection: "column",
         gap: 12,
-        userSelect: 'none',
-        padding: '20px',
-        textAlign: 'center',
+        userSelect: "none",
+        padding: "20px",
+        textAlign: "center",
       }}
     >
       <h1
         className="typing-text"
         style={{
-          fontSize: '2.2rem',
-          fontWeight: '900',
-          background: 'linear-gradient(90deg, #36D1DC, #5B86E5)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
+          fontSize: "2.2rem",
+          fontWeight: "900",
+          background: "linear-gradient(90deg, #36D1DC, #5B86E5)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
           fontFamily: "'Poppins', sans-serif",
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          borderRight: '0.15em solid #5B86E5',
-          width: '22ch',
-          animation: 'typing 3s steps(22), blink 0.75s step-end infinite',
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          borderRight: "0.15em solid #5B86E5",
+          width: "22ch",
+          animation: "typing 3s steps(22), blink 0.75s step-end infinite",
           margin: 0,
         }}
       >
@@ -53,10 +54,10 @@ const AnimatedTypingWithSlogan = () => {
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 3, duration: 1.2 }}
         style={{
-          fontSize: '1rem',
-          fontWeight: '600',
-          fontStyle: 'italic',
-          color: '#2380c3',
+          fontSize: "1rem",
+          fontWeight: "600",
+          fontStyle: "italic",
+          color: "#2380c3",
           margin: 0,
           lineHeight: 1.4,
           fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
@@ -89,50 +90,59 @@ const Login = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
- const onFinish = (values) => {
-    console.log('Login success:', values);
-    message.success('Login successful!');
-    
+  const onFinish = async (values) => {
+    try {
+      const { data } = await authAPIs.login(values);
 
-    navigate('/');
+      message.success("Login successful!");
+      console.log("Response:", data);
+
+      localStorage.setItem("token", data.token); // adjust based on your API
+      navigate("/");
+    } catch (error) {
+      console.error("Login error:", error);
+      const msg =
+        error.response?.data?.message ||
+        error.response?.data?.detail ||
+        "Login failed. Please try again.";
+      message.error(msg);
+    }
   };
 
   const onFinishFailed = (errorInfo) => {
-    console.log('Login failed:', errorInfo);
-    message.error('Please check the form fields and try again.');
+    console.log("Login failed:", errorInfo);
+    message.error("Please check the form fields and try again.");
   };
 
   return (
     <div
       style={{
-        minHeight: '92vh',
-        background: '#f0f2f5',
-        padding: '20px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        minHeight: "92vh",
+        background: "#f0f2f5",
+        padding: "20px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
       <Row
         gutter={[32, 32]}
-        style={{ width: '100%', maxWidth: '1200px' }}
+        style={{ width: "100%", maxWidth: "1200px" }}
         align="middle"
         justify="center"
       >
-        {/* Left section */}
         <Col
           xs={24}
           md={12}
           style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
           <AnimatedTypingWithSlogan />
         </Col>
 
-        {/* Right section */}
         <Col xs={24} md={12}>
           <motion.div
             initial={{ opacity: 0, x: 50 }}
@@ -143,20 +153,20 @@ const Login = () => {
               bordered={false}
               style={{
                 borderRadius: 20,
-                background: 'white',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-                border: '1px solid #ddd',
-                width: '100%',
+                background: "white",
+                boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                border: "1px solid #ddd",
+                width: "100%",
                 maxWidth: 400,
-                margin: '0 auto',
+                margin: "0 auto",
               }}
             >
               <Title
                 level={2}
                 style={{
-                  textAlign: 'center',
+                  textAlign: "center",
                   marginBottom: 24,
-                  color: '#1890ff',
+                  color: "#1890ff",
                 }}
               >
                 Login
@@ -166,7 +176,7 @@ const Login = () => {
                 form={form}
                 name="loginForm"
                 layout="vertical"
-                initialValues={{ email: '', password: '', userType: '' }}
+                initialValues={{ email: "", password: "", userType: "" }}
                 onFinish={onFinish}
                 onFinishFailed={onFinishFailed}
                 autoComplete="off"
@@ -175,8 +185,8 @@ const Login = () => {
                   label="Email"
                   name="email"
                   rules={[
-                    { required: true, message: 'Please input your email!' },
-                    { type: 'email', message: 'Please enter a valid email!' },
+                    { required: true, message: "Please input your email!" },
+                    { type: "email", message: "Please enter a valid email!" },
                   ]}
                 >
                   <Input placeholder="Enter your email" />
@@ -185,43 +195,44 @@ const Login = () => {
                 <Form.Item
                   label="Password"
                   name="password"
-                  rules={[{ required: true, message: 'Please input your password!' }]}
+                  rules={[
+                    { required: true, message: "Please input your password!" },
+                  ]}
                 >
                   <Input.Password placeholder="Enter your password" />
                 </Form.Item>
 
-                {/* Radio buttons instead of dropdown */}
                 <Form.Item
                   label="User Type"
-                  name="userType"
-                  rules={[{ required: true, message: 'Please select a user type!' }]}
+                  name="user_type"
+                  rules={[
+                    { required: true, message: "Please select a user type!" },
+                  ]}
                 >
-                 <div style={{  display: 'flex', gap: '90px' , marginLeft: '60px'}}>
+                  <div
+                    style={{ display: "flex", gap: "90px", marginLeft: "60px" }}
+                  >
                     <Radio.Group>
-                    <Radio value="admin" style={{ marginRight: 30 }}>Admin</Radio>
-                    <Radio value="unit">Unit</Radio>
+                      <Radio value="admin" style={{ marginRight: 30 }}>
+                        Admin
+                      </Radio>
+                      <Radio value="unit">Unit</Radio>
                     </Radio.Group>
-                </div>
+                  </div>
                 </Form.Item>
-
-                {/* <div style={{ textAlign: 'right', marginBottom: 16 }}>
-                  <a href="#" style={{ color: '#1890ff' }}>
-                    Forgot password?
-                  </a>
-                </div> */}
 
                 <Form.Item style={{ marginBottom: 0 }}>
                   <Button
                     type="primary"
                     htmlType="submit"
                     style={{
-                      width: '100%',
+                      width: "100%",
                       borderRadius: 8,
-                      padding: '10px 0',
-                      fontWeight: '600',
+                      padding: "10px 0",
+                      fontWeight: "600",
                       fontSize: 16,
-                      background: 'linear-gradient(135deg, #36D1DC, #5B86E5)',
-                      border: 'none',
+                      background: "linear-gradient(135deg, #36D1DC, #5B86E5)",
+                      border: "none",
                     }}
                   >
                     Login
@@ -229,9 +240,12 @@ const Login = () => {
                 </Form.Item>
               </Form>
 
-              <div style={{ textAlign: 'center', marginTop: 16 }}>
-                <Text type="secondary">Don't have an account?</Text>{' '}
-                <a href="/signup" style={{ color: '#1890ff', fontWeight: '500' }}>
+              <div style={{ textAlign: "center", marginTop: 16 }}>
+                <Text type="secondary">Don't have an account?</Text>{" "}
+                <a
+                  href="/signup"
+                  style={{ color: "#1890ff", fontWeight: "500" }}
+                >
                   Sign up
                 </a>
               </div>

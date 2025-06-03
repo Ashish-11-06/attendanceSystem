@@ -14,6 +14,11 @@ const Attendance_list = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+const [pagination, setPagination] = useState({
+      current: 1,
+      pageSize: 10,
+    });
+
   const containerStyle = {
     display: 'flex',
     justifyContent: 'space-between',
@@ -127,12 +132,24 @@ const Attendance_list = () => {
         </div>
       </div>
 
-      <Table
-        dataSource={dataSource}
-        columns={columns}
-        bordered
-        scroll={{ x: 'max-content' }}
-      />
+     <Table
+  dataSource={dataSource}
+  columns={columns}
+  pagination={{
+    ...pagination,
+    total: dataSource.length,
+    showSizeChanger: false,
+  }}
+  onChange={(paginationInfo) => {
+    setPagination({
+      current: paginationInfo.current,
+      pageSize: paginationInfo.pageSize,
+    });
+  }}
+  bordered
+  scroll={{ x: 'max-content' }}
+/>
+
     </div>
   );
 };
