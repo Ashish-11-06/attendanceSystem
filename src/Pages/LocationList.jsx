@@ -14,7 +14,7 @@ const LocationList = () => {
   const { locations, loading, error } = useSelector((state) => state.locations);
 
   // States and Cities arrays moved here outside handler
-  const states = ['California', 'Texas', 'New York', 'Florida', 'Illinois'];
+  const states = ['Mumbai'];
   const cities = ['Los Angeles', 'Austin', 'New York City', 'Miami', 'Chicago'];
 
   const [pagination, setPagination] = useState({
