@@ -17,6 +17,12 @@ const LocationList = () => {
   const states = ['California', 'Texas', 'New York', 'Florida', 'Illinois'];
   const cities = ['Los Angeles', 'Austin', 'New York City', 'Miami', 'Chicago'];
 
+  const [pagination, setPagination] = useState({
+  current: 1,
+  pageSize: 10,
+});
+
+
   useEffect(() => {
     dispatch(fetchAllLocations());
   }, [dispatch]);
@@ -40,7 +46,7 @@ const filteredData = locations.filter(({ address, state, city }) => {
     {
       title: 'Sr. No.',
       key: 'srNo',
-      render: (_, __, index) => index + 1,
+      render: (_, __, index) => (pagination.current - 1) * pagination.pageSize + index + 1,
       width: '8%',
     },
     { title: 'Address', dataIndex: 'address', key: 'address', width: '40%' },
@@ -130,7 +136,13 @@ const filteredData = locations.filter(({ address, state, city }) => {
           <Table
             dataSource={filteredData}
             columns={columns}
-            pagination={{ pageSize: 10 }}
+            pagination={{
+                current: pagination.current,
+                pageSize: pagination.pageSize,
+                total: filteredData.length,
+                showSizeChanger: false,
+              }}
+            onChange={(pagination) => setPagination(pagination)} 
             bordered
             size="small"
             rowKey="id"

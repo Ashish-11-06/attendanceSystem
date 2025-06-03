@@ -24,6 +24,10 @@ const UnitList = () => {
   const [form] = Form.useForm();
 
   const { units, loading, error } = useSelector((state) => state.units);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+  });
 
    useEffect(() => {
       dispatch(fetchAllUnits());
@@ -53,7 +57,7 @@ const UnitList = () => {
     // {
     //   title: 'Sr. No.',
     //   key: 'srNo',
-    //   render: (_, __, index) => index + 1,
+    //   render: (_, __, index) => (pagination.current - 1) * pagination.pageSize + index + 1,
     //   width: 80,
     // },
      {
@@ -156,7 +160,13 @@ const UnitList = () => {
           <Table
             dataSource={filteredData}
             columns={columns}
-            pagination={{ pageSize: 10 }}
+            pagination={{
+                current: pagination.current,
+                pageSize: pagination.pageSize,
+                total: filteredData.length,
+                showSizeChanger: false,
+              }}
+            onChange={(pagination) => setPagination(pagination)} 
             bordered
             size="small"
             scroll={{ x: 'max-content' }}

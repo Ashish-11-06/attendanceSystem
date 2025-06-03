@@ -36,6 +36,10 @@ const VolunteerList = () => {
   ]);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+  });
 
   const filteredData = dataSource.filter(({ name, phone, email }) => {
     const lowerSearch = searchText.toLowerCase();
@@ -51,7 +55,7 @@ const VolunteerList = () => {
       title: 'Sr. No.',
       dataIndex: 'key',
       key: 'srNo',
-      render: (_, __, index) => index + 1,
+      render: (_, __, index) => (pagination.current - 1) * pagination.pageSize + index + 1,
       fixed: 'left',
       width: 70,
     },
@@ -178,7 +182,13 @@ const VolunteerList = () => {
           <Table
             dataSource={filteredData}
             columns={columns}
-            pagination={{ pageSize: 5 }}
+            pagination={{
+                current: pagination.current,
+                pageSize: pagination.pageSize,
+                total: filteredData.length,
+                showSizeChanger: false,
+              }}
+            onChange={(pagination) => setPagination(pagination)} 
             bordered
             scroll={{ x: 900 }}
           />
