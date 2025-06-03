@@ -175,9 +175,9 @@ const EventList = () => {
           boxShadow: '0 8px 20px rgba(0, 0, 0, 0.05)',
         }}
       >
-        {loading ? (
-          <Spin size="large" style={{ display: 'block', margin: '60px auto' }} />
-        ) : (
+        {/* {loading ? ( */}
+        <Spin spinning={loading} size='large' tip="Loading Events...">
+        {/* // ) : ( */}
           <Table
             dataSource={filteredData}
             columns={columns}
@@ -187,7 +187,8 @@ const EventList = () => {
             scroll={{ x: 'max-content' }}
             rowKey="id"
           />
-        )}
+          </Spin>
+        {/* )} */}
       </div>
 
       <AddEventModal

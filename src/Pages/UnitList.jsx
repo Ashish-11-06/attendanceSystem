@@ -86,11 +86,13 @@ const UnitList = () => {
       dataIndex: 'email',
       key: 'email',
       width: 200,
+       render: (text) => text || '-',
     },
     {
       title: 'Phone',
       dataIndex: 'phone',
       key: 'phone',
+       render: (text) => text || '-',
       // width: 150,
     },
   ];
@@ -138,42 +140,29 @@ const UnitList = () => {
         </Col>
       </Row>
 
-      {loading ? (
-        <Spin tip="Loading units..." size="large" style={{ display: 'block', marginTop: 100 }} />
-      ) : error ? (
-        <Alert
-          message="Error loading units"
-          description={error}
-          type="error"
-          showIcon
-          style={{ marginBottom: 24 }}
-        />
-      ) : (
-        <div
-          style={{
-            background: '#ffffff',
-            padding: 16,
-            borderRadius: 12,
-            boxShadow: '0 8px 20px rgba(0, 0, 0, 0.05)',
-          }}
-        >
-          <Table
-            dataSource={filteredData}
-            columns={columns}
-            pagination={{
-                current: pagination.current,
-                pageSize: pagination.pageSize,
-                total: filteredData.length,
-                showSizeChanger: false,
-              }}
-            onChange={(pagination) => setPagination(pagination)} 
-            bordered
-            size="small"
-            scroll={{ x: 'max-content' }}
-            rowKey="key"
-          />
-        </div>
-      )}
+    <div
+           style={{
+             background: '#ffffff',
+             padding: 16,
+             borderRadius: 12,
+             boxShadow: '0 8px 20px rgba(0, 0, 0, 0.05)',
+           }}
+         >
+           {/* {loading ? ( */}
+           <Spin spinning={loading} size='large' tip="Loading Events...">
+           {/* // ) : ( */}
+             <Table
+               dataSource={filteredData}
+               columns={columns}
+               pagination={{ pageSize: 10 }}
+               bordered
+               size="small"
+               scroll={{ x: 'max-content' }}
+               rowKey="id"
+             />
+             </Spin>
+           {/* )} */}
+         </div>
 
       <AddUnitModal
         open={isModalOpen}
