@@ -1,4 +1,3 @@
-// src/Models/AddVolunteerModal.jsx
 import React from 'react';
 import { Modal, Form, Input, Select, Row, Col, Button } from 'antd';
 
@@ -8,7 +7,14 @@ const AddVolunteerModal = ({ visible, onCancel, onAdd }) => {
   const [form] = Form.useForm();
 
   const handleFinish = (values) => {
-    onAdd(values);
+    onAdd({
+      name: values.name,
+      gender: values.gender,
+      phone: values.phone || '',
+      email: values.email || '',
+      old_personal_number: values.oldPersonalNumber,
+      new_personal_number: values.newPersonalNumber,
+    });
     form.resetFields();
   };
 
@@ -25,7 +31,7 @@ const AddVolunteerModal = ({ visible, onCancel, onAdd }) => {
       footer={null}
       destroyOnClose
       centered
-      bodyStyle={{ padding: '24px 24px 12px' }}
+      styles={{ body: { padding: '24px 24px 12px' } }}
       width="90%"
       style={{ maxWidth: 600 }}
     >
@@ -63,7 +69,7 @@ const AddVolunteerModal = ({ visible, onCancel, onAdd }) => {
               validator: (_, value) =>
                 !value || /^\d{3}-\d{3}-\d{4}$/.test(value)
                   ? Promise.resolve()
-                  : Promise.reject('Phone number must be in format xxx-xxx-xxxx'),
+                  : Promise.reject('Phone must be in format xxx-xxx-xxxx'),
             },
           ]}
         >
@@ -78,7 +84,7 @@ const AddVolunteerModal = ({ visible, onCancel, onAdd }) => {
               validator: (_, value) =>
                 !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
                   ? Promise.resolve()
-                  : Promise.reject('Please enter a valid email address'),
+                  : Promise.reject('Enter valid email address'),
             },
           ]}
         >

@@ -4,6 +4,8 @@ import { Table, Input, Row, Col, Button, Form, Spin, Alert } from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import AddLocationModal from '../components/Modals/AddLocationModal';
 import { addLocation, fetchAllLocations } from '../Redux/Slices/locationSlice';
+import statesData from '../data/states.json';
+import citiesData from '../data/cities.json';
 
 const LocationList = () => {
   const dispatch = useDispatch();
@@ -13,34 +15,27 @@ const LocationList = () => {
 
   const { locations, loading, error } = useSelector((state) => state.locations);
 
-  // States and Cities arrays moved here outside handler
-  const states = ['Mumbai'];
-  const cities = ['Los Angeles', 'Austin', 'New York City', 'Miami', 'Chicago'];
+  const [selectedStateId, setSelectedStateId] = useState(null);
+  const indianStates = statesData.filter(state => state.country_name === 'India');
+  const filteredCities = citiesData.filter(city => city.state_id === selectedStateId);
 
   const [pagination, setPagination] = useState({
-  current: 1,
-  pageSize: 10,
-});
-
+    current: 1,
+    pageSize: 10,
+  });
 
   useEffect(() => {
     dispatch(fetchAllLocations());
   }, [dispatch]);
 
-const filteredData = locations.filter(({ address, state, city }) => {
-  const searchLower = searchText.toLowerCase();
-
-  const addressStr = address ? address.toLowerCase() : '';
-  const stateStr = state ? state.toLowerCase() : '';
-  const cityStr = city ? city.toLowerCase() : '';
-
-  return (
-    addressStr.includes(searchLower) ||
-    stateStr.includes(searchLower) ||
-    cityStr.includes(searchLower)
-  );
-});
-
+  const filteredData = locations.filter(({ address, state, city }) => {
+    const searchLower = searchText.toLowerCase();
+    return (
+      (address || '').toLowerCase().includes(searchLower) ||
+      (state || '').toLowerCase().includes(searchLower) ||
+      (city || '').toLowerCase().includes(searchLower)
+    );
+  });
 
   const columns = [
     {
@@ -59,21 +54,24 @@ const filteredData = locations.filter(({ address, state, city }) => {
   const handleCancel = () => {
     setIsModalVisible(false);
     form.resetFields();
+    setSelectedStateId(null);
   };
 
   const handleAddLocation = async (values) => {
+    const selectedState = indianStates.find(state => state.id === values.state);
+
     const payload = {
       address: values.address,
-      state: values.state,
+      state: selectedState ? selectedState.name : '',
       city: values.city,
     };
 
-
-
     try {
-      await dispatch(addLocation(payload)).unwrap(); 
-      form.resetFields(); 
-      setIsModalVisible(false); 
+      await dispatch(addLocation(payload)).unwrap();
+      form.resetFields();
+      setSelectedStateId(null);
+      setIsModalVisible(false);
+      dispatch(fetchAllLocations());
     } catch (err) {
       console.error('Failed to add location:', err);
     }
@@ -92,7 +90,6 @@ const filteredData = locations.filter(({ address, state, city }) => {
           <Input
             placeholder="Search by address, state or city"
             allowClear
-            // size="large"
             prefix={<SearchOutlined style={{ color: '#999' }} />}
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
@@ -102,7 +99,6 @@ const filteredData = locations.filter(({ address, state, city }) => {
         <Col>
           <Button
             type="primary"
-            // size="large"
             icon={<PlusOutlined />}
             onClick={showModal}
             style={{
@@ -132,17 +128,17 @@ const filteredData = locations.filter(({ address, state, city }) => {
           overflowX: 'auto',
         }}
       >
-        <Spin spinning={loading}>
+        <Spin spinning={loading} tip="Loading Locations...">
           <Table
             dataSource={filteredData}
             columns={columns}
             pagination={{
-                current: pagination.current,
-                pageSize: pagination.pageSize,
-                total: filteredData.length,
-                showSizeChanger: false,
-              }}
-            onChange={(pagination) => setPagination(pagination)} 
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              total: filteredData.length,
+              showSizeChanger: false,
+            }}
+            onChange={(pagination) => setPagination(pagination)}
             bordered
             size="small"
             rowKey="id"
@@ -154,13 +150,11 @@ const filteredData = locations.filter(({ address, state, city }) => {
       <AddLocationModal
         visible={isModalVisible}
         onCancel={handleCancel}
-         onFinish={async (values) => {
-              await handleAddLocation(values); 
-                dispatch(fetchAllLocations());   
-              }}
+        onFinish={handleAddLocation}
         form={form}
-        states={states}
-        cities={cities}
+        states={indianStates}
+        cities={filteredCities}
+        onStateChange={setSelectedStateId}
       />
     </div>
   );
