@@ -105,8 +105,6 @@ const EventList = () => {
   ];
 
 
-
-
   const showModal = () => {
     setIsModalVisible(true);
   };

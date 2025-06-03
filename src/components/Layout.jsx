@@ -191,11 +191,14 @@ const AppLayout = ({ children }) => {
             </Breadcrumb>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontWeight: 500 }}>Welcome, User</span>
+         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontWeight: 500 }}>
+              {/* Welcome, {user.user_type === "admin" ? user.admin_name : user.unit_name || "user"} */}Welcome,User
+            </span>
             <Avatar size="large" icon={<SmileOutlined />} />
-          </div>
-        </Header>
+      </div>
+
+        </Header>   
 
         <Content
           style={{
