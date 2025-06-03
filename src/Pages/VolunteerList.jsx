@@ -1,47 +1,43 @@
-import React, { useState } from 'react';
-import { Table, Input, Row, Col, Button } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Table, Input, Row, Col, Button, Spin, message } from 'antd';
 import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import AddVolunteerModal from '../components/Modals/AddVolunteerModal';
+import { fetchAllVolinteer } from '../Redux/Slices/VolinteerSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 const VolunteerList = () => {
+
+  const dispatch = useDispatch();
+  const { volinteers, loading, error } = useSelector((state) => state.volinteers);
+
+  useEffect(() => {
+    dispatch(fetchAllVolinteer());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (error) {
+      message.error(`Failed to load events: ${error}`);
+    }
+  }, [error]);
   const [searchText, setSearchText] = useState('');
-  const [dataSource, setDataSource] = useState([
-    {
-      key: '1',
-      name: 'Alice Johnson',
-      gender: 'Female',
-      phone: '123-456-7890',
-      email: 'alice@example.com',
-      oldPersonalNumber: 'ABC123',
-      newPersonalNumber: 'XYZ789',
-    },
-    {
-      key: '2',
-      name: 'Bob Smith',
-      gender: 'Male',
-      phone: '987-654-3210',
-      email: '-',
-      oldPersonalNumber: 'DEF456',
-      newPersonalNumber: 'LMN456',
-    },
-    {
-      key: '3',
-      name: 'Charlie Brown',
-      gender: 'Male',
-      phone: '555-555-5555',
-      email: 'charlie.brown@example.com',
-      oldPersonalNumber: 'GHI789',
-      newPersonalNumber: 'OPQ123',
-    },
-  ]);
+
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const filteredData = dataSource.filter(({ name, phone, email }) => {
+  console.log(volinteers);
+
+  const filteredData = volinteers.filter(({ name, email, volunteer_id, old_personal_number, new_personal_number, phone, gender }) => {
     const lowerSearch = searchText.toLowerCase();
     return (
       name.toLowerCase().includes(lowerSearch) ||
-      phone.toLowerCase().includes(lowerSearch) ||
+      volunteer_id.toLowerCase().includes(lowerSearch) ||
+      old_personal_number.toLowerCase().includes(lowerSearch) ||
+      new_personal_number.toLowerCase().includes(lowerSearch) ||
+      phone?.toString().toLowerCase().includes(lowerSearch) ||
+      gender.toString().toLowerCase().includes(lowerSearch) ||
+
+
+      // phone.toLowerCase().includes(lowerSearch) ||
       (email && email.toLowerCase().includes(lowerSearch))
     );
   });
@@ -55,7 +51,8 @@ const VolunteerList = () => {
       fixed: 'left',
       width: 70,
     },
-    { title: 'Name', dataIndex: 'name', key: 'name', width: 150 },
+    { title: 'Volinteer ID', dataIndex: 'volunteer_id', key: 'volunteer_id', width: 150 },
+     { title: 'Name', dataIndex: 'name', key: 'name', width: 150 },
     { title: 'Gender', dataIndex: 'gender', key: 'gender', width: 100 },
     {
       title: 'Phone Number',
@@ -72,14 +69,14 @@ const VolunteerList = () => {
       width: 200,
     },
     {
-      title: 'Old Personal Number',
-      dataIndex: 'oldPersonalNumber',
+      title: 'Old P. No.',
+      dataIndex: 'old_personal_number',
       key: 'oldPersonalNumber',
       width: 150,
     },
     {
-      title: 'New Personal Number',
-      dataIndex: 'newPersonalNumber',
+      title: 'New P. No.',
+      dataIndex: 'new_personal_number',
       key: 'newPersonalNumber',
       width: 150,
     },
@@ -145,7 +142,7 @@ const VolunteerList = () => {
             <Input
               placeholder="Search by name, phone, or email"
               allowClear
-              size="large"
+              // size="large"
               prefix={<SearchOutlined style={{ color: '#999' }} />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
@@ -155,7 +152,7 @@ const VolunteerList = () => {
           <Col xs={12} sm={6} md={6} lg={4} xl={3}>
             <Button
               type="primary"
-              size="large"
+              // size="large"
               icon={<PlusOutlined />}
               className="addVolunteerBtn"
               onClick={showModal}
@@ -168,20 +165,34 @@ const VolunteerList = () => {
 
         <div
           style={{
-            background: '#ffffff',
-            padding: 16,
+            // background: '#ffffff',
+            // padding: 16,
             borderRadius: 12,
             boxShadow: '0 8px 20px rgba(0, 0, 0, 0.05)',
             overflowX: 'auto',
           }}
         >
-          <Table
-            dataSource={filteredData}
-            columns={columns}
-            pagination={{ pageSize: 5 }}
-            bordered
-            scroll={{ x: 900 }}
-          />
+          <Spin spinning={loading} tip="Loading Volunteers...">
+            <div
+              style={{
+                background: '#ffffff',
+                padding: 16,
+                borderRadius: 12,
+                boxShadow: '0 8px 20px rgba(0, 0, 0, 0.05)',
+                overflowX: 'auto',
+              }}
+            >
+              <Table
+                dataSource={filteredData}
+                columns={columns}
+                size='small'
+                pagination={{ pageSize: 5 }}
+                bordered
+                scroll={{ x: 900 }}
+              />
+            </div>
+          </Spin>
+
         </div>
 
         {/* New modal component here */}

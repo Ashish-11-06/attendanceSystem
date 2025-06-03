@@ -15,11 +15,11 @@ export const fetchAllVolinteer = createAsyncThunk(
 );
 
 // Thunk to add a new event
-export const addEvent = createAsyncThunk(
-  'volinteers/addEvent',
-  async (newEvent, thunkAPI) => {
+export const addVolinteer = createAsyncThunk(
+  'volinteers/addvolinteer',
+  async (newVolinteer, thunkAPI) => {
     try {
-      const response = await volinteerAPIs.addEvent(newEvent);
+      const response = await volinteerAPIs.addEvent(newVolinteer);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data || error.message);
@@ -52,15 +52,15 @@ const volineerSlice = createSlice({
         state.error = action.payload;
       })
     //   ----------------------------------------
-       .addCase(addEvent.pending, (state) => {
+       .addCase(addVolinteer.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(addEvent.fulfilled, (state, action) => {
+      .addCase(addVolinteer.fulfilled, (state, action) => {
         state.loading = false;
         state.volinteers.push(action.payload); 
       })
-      .addCase(addEvent.rejected, (state, action) => {
+      .addCase(addVolinteer.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
