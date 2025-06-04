@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { TimePicker } from 'antd';
+import dayjs from 'dayjs';
 import {
   Select,
   Form,
@@ -44,6 +46,7 @@ const Attendance = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fileList, setFileList] = useState([]);
   const [filterOption, setFilterOption] = useState(null);
+  const [localVolunteers, setLocalVolunteers] = useState([]);
 
   useEffect(() => {
     dispatch(fetchAllEvents());
@@ -62,13 +65,44 @@ const Attendance = () => {
     }
   };
 
+  useEffect(() => {
+    setLocalVolunteers(
+      volinteers?.map((vol) => ({
+        ...vol,
+        key: vol.id || vol.new_personal_number || vol.atdId || String(vol.name) // make sure key is unique & consistent
+      })) || []
+    );
+  }, [volinteers]);
+
   const handlePresentToggle = (checked, recordKey) => {
-    // Optional
+    setLocalVolunteers((prev) =>
+      prev.map((v) =>
+        v.key === recordKey
+          ? { ...v, present: checked }
+          : v
+      )
+    );
   };
 
   const handleRemarkChange = (value, recordKey) => {
-    // Optional
+    setLocalVolunteers((prev) =>
+      prev.map((v) =>
+        v.key === recordKey
+          ? { ...v, remark: value }
+          : v
+      )
+    );
   };
+
+const handleInTimeChange = (time, timeString, recordKey) => {
+  setLocalVolunteers((prev) =>
+    prev.map((v) =>
+      v.key === recordKey
+        ? { ...v, in_time: timeString }
+        : v
+    )
+  );
+};
 
   const handleSubmitAttendance = () => {
     alert('Attendance submitted!');
@@ -123,8 +157,8 @@ const Attendance = () => {
       title: 'Is Reg?',
       dataIndex: 'is_registered',
       key: 'is_registered',
-      render: (value) => (value ? 'Yes' : 'No'),  
-  ellipsis: true,
+      render: (value) => (value ? 'Yes' : 'No'),
+      ellipsis: true,
     },
     {
       title: 'Present / Absent',
@@ -138,7 +172,23 @@ const Attendance = () => {
           {present ? 'Present' : 'Absent'}
         </Checkbox>
       ),
+
     },
+    {
+  title: 'In Time',
+  dataIndex: 'in_time',
+  key: 'in_time',
+  render: (in_time, record) => (
+    <TimePicker
+      value={in_time ? dayjs(in_time, 'HH:mm') : null}
+      onChange={(time, timeString) =>
+        handleInTimeChange(time, timeString, record.key)
+      }
+      format="HH:mm"
+    />
+  ),
+},
+
     {
       title: 'Remark',
       dataIndex: 'remark',
@@ -246,7 +296,7 @@ const Attendance = () => {
           <Row style={{ overflowX: 'auto' }}>
             <Col span={24}>
               <Table
-                dataSource={filteredVolunteers}
+                dataSource={localVolunteers}
                 columns={columns}
                 pagination={false}
                 rowKey={(record) => record.key || record.atdId || record.id || Math.random()}
