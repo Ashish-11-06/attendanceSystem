@@ -1,60 +1,77 @@
 import React, { useState, useEffect } from 'react';
-import { Select, Form, Row, Col, Table, Checkbox, Button, Input, Spin, Alert } from 'antd';
+import {
+  Select,
+  Form,
+  Row,
+  Col,
+  Table,
+  Checkbox,
+  Button,
+  Input,
+  Spin,
+  Alert,
+} from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllEvents } from '../Redux/Slices/EventSlice';
 import { fetchAllUnits } from '../Redux/Slices/UnitSlice';
-import { fetchAttendance, clearAttendance } from '../Redux/Slices/AttendanceSlice';
+import {
+  fetchAttendance,
+  clearAttendance,
+} from '../Redux/Slices/AttendanceSlice';
 import AttendanceUploadModal from '../components/Modals/AttendanceUploadModal';
+import { getVolunteerByUnitId } from '../Redux/Slices/VolinteerSlice';
 
 const { Option } = Select;
 
 const Attendance = () => {
   const dispatch = useDispatch();
 
-  const { events, loading: eventsLoading } = useSelector((state) => state.events);
-  const { units, loading: unitsLoading } = useSelector((state) => state.units);
-  const { data: attendanceData, loading: attendanceLoading, error: attendanceError } = useSelector(
-    (state) => state.attendance
+  const { events, loading: eventsLoading } = useSelector(
+    (state) => state.events
   );
+  const { units, loading: unitsLoading } = useSelector(
+    (state) => state.units
+  );
+  const {
+    volinteers,
+    loading: attendanceLoading,
+    error: attendanceError,
+  } = useSelector((state) => state.volinteers);
 
   const [form] = Form.useForm();
   const [uploadForm] = Form.useForm();
   const [showTable, setShowTable] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fileList, setFileList] = useState([]);
+  const [filterOption, setFilterOption] = useState(null);
 
   useEffect(() => {
     dispatch(fetchAllEvents());
     dispatch(fetchAllUnits());
   }, [dispatch]);
 
-const onValuesChange = (_, allValues) => {
-  if (allValues?.event && allValues?.unit) {
-    const payload = {
-      event: allValues.event,
-      unit: allValues.unit,
-    };
-    console.log('Fetching attendance with:', payload);
-    // dispatch(fetchAttendance(payload));
-    setShowTable(true);
-  } else {
-    // dispatch(clearAttendance());
-    setShowTable(false);
-  }
-};
-
+  const onValuesChange = (_, allValues) => {
+    if (allValues?.event && allValues?.unit) {
+      const payload = {
+        unit: allValues.unit,
+      };
+      dispatch(getVolunteerByUnitId(payload));
+      setShowTable(true);
+    } else {
+      setShowTable(false);
+    }
+  };
 
   const handlePresentToggle = (checked, recordKey) => {
-    // Optional: Implement local edit of attendance if needed
+    // Optional
   };
 
   const handleRemarkChange = (value, recordKey) => {
-    // Optional: Implement local edit of remark if needed
+    // Optional
   };
 
   const handleSubmitAttendance = () => {
     alert('Attendance submitted!');
-    console.log('Submitted attendance data:', attendanceData);
   };
 
   const showModal = () => setIsModalOpen(true);
@@ -78,12 +95,37 @@ const onValuesChange = (_, allValues) => {
       });
   };
 
+  // Apply filter based on dropdown selection
+  const filteredVolunteers = volinteers?.filter((vol) => {
+    if (!filterOption) return true;
+    if (filterOption === 'male' || filterOption === 'female') {
+      return vol.gender?.toLowerCase() === filterOption;
+    }
+    if (filterOption === 'registered') {
+      return vol.is_registered === true;
+    }
+    if (filterOption === 'unregistered') {
+      return vol.is_registered === false;
+    }
+    return true;
+  });
+
   const columns = [
-    { title: 'ATD_ID', dataIndex: 'atdId', key: 'atdId', ellipsis: true },
+    {
+      title: 'New P no.',
+      dataIndex: 'new_personal_number',
+      key: 'new_personal_number',
+      ellipsis: true,
+    },
     { title: 'Name', dataIndex: 'name', key: 'name', ellipsis: true },
     { title: 'Gender', dataIndex: 'gender', key: 'gender', ellipsis: true },
-    { title: 'Email', dataIndex: 'email', key: 'email', ellipsis: true },
-    { title: 'Mobile', dataIndex: 'mobile', key: 'mobile', ellipsis: true },
+    {
+      title: 'Is Reg?',
+      dataIndex: 'is_registered',
+      key: 'is_registered',
+      render: (value) => (value ? 'Yes' : 'No'),  
+  ellipsis: true,
+    },
     {
       title: 'Present / Absent',
       dataIndex: 'present',
@@ -126,7 +168,7 @@ const onValuesChange = (_, allValues) => {
 
       <Form form={form} layout="vertical" onValuesChange={onValuesChange}>
         <Row gutter={[16, 16]}>
-          <Col xs={24} sm={12}>
+          <Col xs={24} sm={8}>
             <Form.Item
               label="Choose Event"
               name="event"
@@ -140,23 +182,19 @@ const onValuesChange = (_, allValues) => {
                 optionFilterProp="children"
                 notFoundContent={eventsLoading ? <Spin size="small" /> : 'No events found'}
               >
-                {events && events.length > 0 ? (
-                  events.map((event, index) => (
-                    <Option
-                      key={event.id ?? `event-${index}`}
-                      value={event.id ?? `event-${index}`}
-                    >
-                      {`${event.event_name} - ${new Date(event.start_date).toLocaleDateString('en-GB')}`}
-                    </Option>
-                  ))
-                ) : (
-                  <Option disabled>No events available</Option>
-                )}
+                {events?.map((event, index) => (
+                  <Option
+                    key={event.id ?? `event-${index}`}
+                    value={event.id ?? `event-${index}`}
+                  >
+                    {`${event.event_name} - ${new Date(event.start_date).toLocaleDateString('en-GB')}`}
+                  </Option>
+                ))}
               </Select>
             </Form.Item>
           </Col>
 
-          <Col xs={24} sm={12}>
+          <Col xs={24} sm={8}>
             <Form.Item
               label="Choose Unit"
               name="unit"
@@ -170,18 +208,29 @@ const onValuesChange = (_, allValues) => {
                 optionFilterProp="children"
                 notFoundContent={unitsLoading ? <Spin size="small" /> : 'No units found'}
               >
-                {units && units.length > 0 ? (
-                  units.map((unit, index) => (
-                    <Option
-                      key={unit.id ?? `unit-${index}`}
-                      value={unit.id ?? `unit-${index}`}
-                    >
-                      {`${unit.unit_id ?? unit.id} - ${unit.unit_name ?? unit.name}`}
-                    </Option>
-                  ))
-                ) : (
-                  <Option disabled>No units available</Option>
-                )}
+                {units?.map((unit, index) => (
+                  <Option
+                    key={unit.id ?? `unit-${index}`}
+                    value={unit.id ?? `unit-${index}`}
+                  >
+                    {`${unit.unit_id ?? unit.id} - ${unit.unit_name ?? unit.name}`}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Col>
+
+          <Col xs={24} sm={8}>
+            <Form.Item label="Filter Volunteers">
+              <Select
+                allowClear
+                placeholder="Select filter"
+                onChange={(value) => setFilterOption(value)}
+              >
+                <Option value="male">Male</Option>
+                <Option value="female">Female</Option>
+                <Option value="registered">Registered</Option>
+                <Option value="unregistered">Unregistered</Option>
               </Select>
             </Form.Item>
           </Col>
@@ -190,11 +239,14 @@ const onValuesChange = (_, allValues) => {
 
       {showTable && (
         <>
-          {attendanceError && <Alert message={attendanceError.error} type="error" style={{ marginBottom: 16 }} />}
+          {attendanceError && (
+            <Alert message={attendanceError} type="error" style={{ marginBottom: 16 }} />
+          )}
+
           <Row style={{ overflowX: 'auto' }}>
             <Col span={24}>
               <Table
-                dataSource={attendanceData}
+                dataSource={filteredVolunteers}
                 columns={columns}
                 pagination={false}
                 rowKey={(record) => record.key || record.atdId || record.id || Math.random()}
