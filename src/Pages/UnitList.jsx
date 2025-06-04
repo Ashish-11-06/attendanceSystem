@@ -9,7 +9,6 @@ import {
   Form,
   message,
   Spin,
-  Alert,
 } from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
@@ -18,29 +17,28 @@ import AddUnitModal from '../components/Modals/AddUnitModal';
 import { fetchAllUnits } from '../Redux/Slices/UnitSlice';
 
 const UnitList = () => {
-   const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const [searchText, setSearchText] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
+  const [editingUnit, setEditingUnit] = useState(null);
 
   const { units, loading, error } = useSelector((state) => state.units);
-const [pagination, setPagination] = useState({
-      current: 1,
-      pageSize: 10,
-    });
-  
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+  });
 
-   useEffect(() => {
-      dispatch(fetchAllUnits());
-    }, [dispatch]);
-  
-    useEffect(() => {
-      if (error) {
-        message.error(`Failed to load events: ${error}`);
-      }
-    }, [error]);
+  useEffect(() => {
+    dispatch(fetchAllUnits());
+  }, [dispatch]);
 
-  // Filter units based on name or any location field
+  useEffect(() => {
+    if (error) {
+      message.error(`Failed to load events: ${error}`);
+    }
+  }, [error]);
+
   const filteredData = units?.filter(({ email, unit_name, unit_id, phone, location }) => {
     const search = searchText.toLowerCase();
     return (
@@ -52,8 +50,6 @@ const [pagination, setPagination] = useState({
     );
   });
 
-
-  // Define table columns
   const columns = [
     {
       title: 'Sr. No.',
@@ -61,45 +57,54 @@ const [pagination, setPagination] = useState({
       render: (_, __, index) => (pagination.current - 1) * pagination.pageSize + index + 1,
       width: 80,
     },
-     {
+    {
       title: 'Unit ID',
       dataIndex: 'unit_id',
       key: 'unit_id',
-      // width: 150,
     },
-    
     {
       title: 'Name',
       dataIndex: 'unit_name',
       key: 'name',
-      // width: 150,
     },
-    
     {
       title: 'Location',
       dataIndex: 'location',
       key: 'location',
-      // width: 250,
-     
     },
     {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',
       width: 200,
-       render: (text) => text || '-',
+      render: (text) => text || '-',
     },
     {
       title: 'Phone',
       dataIndex: 'phone',
       key: 'phone',
-       render: (text) => text || '-',
-      // width: 150,
+      render: (text) => text || '-',
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (_, record) => (
+        <Button
+          type="link"
+          onClick={() => {
+            setEditingUnit(record);
+            setIsModalOpen(true);
+          }}
+        >
+          Edit
+        </Button>
+      ),
     },
   ];
 
   const handleCancel = () => {
     setIsModalOpen(false);
+    setEditingUnit(null);
     form.resetFields();
   };
 
@@ -107,12 +112,7 @@ const [pagination, setPagination] = useState({
     <div style={{ padding: 20, background: '#f4f7fa', minHeight: '100vh' }}>
       <h1 style={{ marginBottom: 30 }}>Unit List</h1>
 
-      <Row
-        justify="space-between"
-        align="middle"
-        gutter={[16, 16]}
-        style={{ marginBottom: 24 }}
-      >
+      <Row justify="space-between" align="middle" gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col xs={24} sm={18} md={16} lg={12} xl={10}>
           <Input
             placeholder="Search by name or location"
@@ -126,7 +126,10 @@ const [pagination, setPagination] = useState({
           <Button
             type="primary"
             icon={<PlusOutlined />}
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              setIsModalOpen(true);
+              setEditingUnit(null);
+            }}
             style={{
               fontSize: 16,
               padding: '10px 30px',
@@ -141,46 +144,42 @@ const [pagination, setPagination] = useState({
         </Col>
       </Row>
 
-    <div
-           style={{
-             background: '#ffffff',
-             padding: 16,
-             borderRadius: 12,
-             boxShadow: '0 8px 20px rgba(0, 0, 0, 0.05)',
-           }}
-         >
-           {/* {loading ? ( */}
-           <Spin spinning={loading} size='large' tip="Loading Events...">
-           {/* // ) : ( */}
-             
-<Table
-  dataSource={filteredData}
-  columns={columns}
-  pagination={{
-    ...pagination,
-    total: filteredData.length,
-    showSizeChanger: false,
-    // pageSizeOptions: ['5', '10', '20', '50'],
-  }}
-  onChange={(paginationInfo) => {
-    setPagination({
-      current: paginationInfo.current,
-      pageSize: paginationInfo.pageSize,
-    });
-  }}
-  bordered
-  size="small"
-  scroll={{ x: 'max-content' }}
-  rowKey="id"
-/>
-             </Spin>
-        
-         </div>
+      <div
+        style={{
+          background: '#ffffff',
+          padding: 16,
+          borderRadius: 12,
+          boxShadow: '0 8px 20px rgba(0, 0, 0, 0.05)',
+        }}
+      >
+        <Spin spinning={loading} size="large" tip="Loading Events...">
+          <Table
+            dataSource={filteredData}
+            columns={columns}
+            pagination={{
+              ...pagination,
+              total: filteredData.length,
+              showSizeChanger: false,
+            }}
+            onChange={(paginationInfo) => {
+              setPagination({
+                current: paginationInfo.current,
+                pageSize: paginationInfo.pageSize,
+              });
+            }}
+            bordered
+            size="small"
+            scroll={{ x: 'max-content' }}
+            rowKey="id"
+          />
+        </Spin>
+      </div>
 
       <AddUnitModal
         open={isModalOpen}
         onCancel={handleCancel}
         form={form}
+        editingUnit={editingUnit}
       />
     </div>
   );

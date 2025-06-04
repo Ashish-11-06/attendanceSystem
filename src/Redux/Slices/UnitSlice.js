@@ -27,6 +27,19 @@ export const addUnit = createAsyncThunk(
   }
 );
 
+export const updateUnit = createAsyncThunk(
+  'units/updateUnit',
+  async (data, thunkAPI) => {
+    try {
+      const response = await unitAPIs.updateUnit(data); // Your API endpoint
+      return response.data;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.response?.data || 'Update failed');
+    }
+  }
+);
+
+
 const unitSlice = createSlice({
   name: 'units',
   initialState: {
@@ -61,6 +74,22 @@ const unitSlice = createSlice({
         state.units.push(action.payload); 
       })
       .addCase(addUnit.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // ----------------------------------------
+      .addCase(updateUnit.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateUnit.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.units.findIndex(unit => unit.unit_id === action.payload.unit_id);
+        if (index !== -1) {
+          state.units[index] = action.payload; // Update the existing unit
+        }
+      })
+      .addCase(updateUnit.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
