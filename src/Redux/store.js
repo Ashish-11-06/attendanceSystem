@@ -5,6 +5,7 @@ import unitReducer from './Slices/UnitSlice';
 import volinteerReducer from './Slices/VolinteerSlice';
 import attendanceReducer from './Slices/AttendanceSlice';
 import dashboardReducer from './Slices/dashboardSlice';
+import attendanceUploadReducer from './Slices/AttendanceUploadSlice';
 
 export const store = configureStore({
   reducer: {
@@ -14,5 +15,7 @@ export const store = configureStore({
     volinteers: volinteerReducer,
     attendance: attendanceReducer,
     dashboard: dashboardReducer,
+    attendanceUpload: attendanceUploadReducer,
+
   },
 });

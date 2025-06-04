@@ -1,4 +1,4 @@
-import React, { useState, useEffect , useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Table, Tag, Button, Select, Spin, message } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
@@ -9,15 +9,23 @@ import Download from './Download';
 
 const Attendance_list = () => {
   const dispatch = useDispatch();
-  const downloadRef = useRef()
+  const downloadRef = useRef();
 
   const handlePrint = () => {
-  downloadRef.current?.print();
-};
+    downloadRef.current?.print();
+  };
 
-  const { events, loading: eventsLoading, error: eventsError } = useSelector((state) => state.events);
-  const { units, loading: unitsLoading, error: unitsError } = useSelector((state) => state.units);
-  const { volinteers, loading: volunteerLoading, error: volunteerError } = useSelector((state) => state.volinteers);
+  const { events, loading: eventsLoading, error: eventsError } = useSelector(
+    (state) => state.events
+  );
+  const { units, loading: unitsLoading, error: unitsError } = useSelector(
+    (state) => state.units
+  );
+  const {
+    volinteers,
+    loading: volunteerLoading,
+    error: volunteerError,
+  } = useSelector((state) => state.volinteers);
 
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedUnit, setSelectedUnit] = useState(null);
@@ -128,24 +136,31 @@ const Attendance_list = () => {
           flexWrap: 'wrap',
           alignItems: 'center',
           marginBottom: 24,
-          gap: 12,
         }}
       >
         <h1 style={{ margin: 0, fontSize: '1.8rem' }}>Attendance List</h1>
-        <Button
-          type="primary"
-          icon={<DownloadOutlined />}
-          onClick={handleDownload}
-          style={{ minWidth: 120 }}
-          disabled={tableData.length === 0}
+
+        <div
+          style={{
+            display: 'flex',
+            gap: 12,
+          }}
         >
-          Download
-        </Button>
+          <Button
+            type="primary"
+            icon={<DownloadOutlined />}
+            onClick={handleDownload}
+            style={{ minWidth: 120 }}
+            disabled={tableData.length === 0}
+          >
+            Download Attendance
+          </Button>
 
-
-        <Button onClick={handlePrint}>Download Report</Button>
-            <Download ref={downloadRef} />
+          <Button onClick={handlePrint}>Download Report</Button>
+        </div>
       </div>
+
+      <Download ref={downloadRef} />
 
       <div
         style={{
@@ -183,9 +198,7 @@ const Attendance_list = () => {
               optionFilterProp="children"
               allowClear
               filterOption={(input, option) =>
-                option.children
-                  .toLowerCase()
-                  .includes(input.toLowerCase())
+                option.children.toLowerCase().includes(input.toLowerCase())
               }
             >
               {events.map((event) => (
@@ -203,10 +216,10 @@ const Attendance_list = () => {
                   >
                     <p style={{ margin: 0 }}>{event.event_name || event.name}</p> -{' '}
                     <span>
-                        {event.date || event.start_date
-                          ? new Date(event.date || event.start_date).toLocaleDateString('en-GB')
-                          : 'N/A'}
-                      </span>
+                      {event.date || event.start_date
+                        ? new Date(event.date || event.start_date).toLocaleDateString('en-GB')
+                        : 'N/A'}
+                    </span>
                   </div>
                 </Select.Option>
               ))}
@@ -240,16 +253,11 @@ const Attendance_list = () => {
               optionFilterProp="children"
               allowClear
               filterOption={(input, option) =>
-                option.children
-                  .toLowerCase()
-                  .includes(input.toLowerCase())
+                option.children.toLowerCase().includes(input.toLowerCase())
               }
             >
               {units.map((unit) => (
-                <Select.Option
-                  key={unit.unit_id || unit.id}
-                  value={unit.unit_id || unit.id}
-                >
+                <Select.Option key={unit.unit_id || unit.id} value={unit.unit_id || unit.id}>
                   <div
                     style={{
                       display: 'flex',

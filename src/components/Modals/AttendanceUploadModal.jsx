@@ -42,36 +42,40 @@ const AttendanceUploadModal = ({
     setFileList(fileList.slice(-1)); // Only keep latest file
   };
 
-  const handleUploadSubmit = () => {
-    uploadForm
-      .validateFields()
-      .then((values) => {
-        if (fileList.length === 0) {
-          message.warning('Please upload a file!');
-          return;
-        }
+ const handleUploadSubmit = () => {
+  uploadForm
+    .validateFields()
+    .then((values) => {
+      if (fileList.length === 0) {
+        message.warning('Please upload a file!');
+        return;
+      }
 
-        const formData = new FormData();
-        formData.append('file', fileList[0].originFileObj);
-        formData.append('event_id', values.event);
-        formData.append('unit_id', values.unit);
-        formData.append('date', values.date.format('YYYY-MM-DD'));
+      const formData = new FormData();
+         formData.append('file', fileList[0].originFileObj);     // actual file binary
+      formData.append('file_name', fileList[0].name);   
+      formData.append('event', values.event);
+      formData.append('unit', values.unit);
+      formData.append('date', values.date.format('YYYY-MM-DD'));
 
-        dispatch(uploadAttendanceFile(formData))
-          .unwrap()
-          .then((res) => {
-            message.success('Attendance file uploaded successfully!');
-            handleCancel(); // Close and reset modal
-          })
-          .catch((err) => {
-            console.error('Upload failed:', err);
-            message.error('Failed to upload attendance file!');
-          });
-      })
-      .catch((info) => {
-        console.log('Validation Failed:', info);
-      });
-  };
+      dispatch(uploadAttendanceFile(formData))
+        .unwrap()
+        .then(() => {
+          message.success('Attendance file uploaded successfully!');
+          handleCancel();
+          setFileList([]);
+          uploadForm.resetFields();
+        })
+        .catch((err) => {
+          console.error('Upload failed:', err);
+          message.error('Failed to upload attendance file!');
+        });
+    })
+    .catch((info) => {
+      console.log('Validation Failed:', info);
+    });
+};
+
 
   return (
     <Modal
@@ -99,7 +103,7 @@ const AttendanceUploadModal = ({
             notFoundContent={eventsLoading ? <Spin size="small" /> : 'No events found'}
           >
             {events?.map((event, index) => (
-              <Option key={event.event_id ?? index} value={event.event_id ?? index}>
+              <Option key={event.id ?? index} value={event.id ?? index}>
                 {`${event.event_name} - ${new Date(event.start_date).toLocaleDateString('en-GB')}`}
               </Option>
             ))}
