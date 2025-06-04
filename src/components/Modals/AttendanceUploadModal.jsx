@@ -8,6 +8,7 @@ import {
   Button,
   DatePicker,
   Row,
+  Spin,
 } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { useSelector } from 'react-redux';
@@ -23,7 +24,7 @@ const AttendanceUploadModal = ({
   setFileList,
 }) => {
   const handleUploadChange = ({ fileList }) => setFileList(fileList.slice(-1));
- const { events, loading: eventsLoading } = useSelector(
+  const { events, loading: eventsLoading } = useSelector(
     (state) => state.events
   );
   const { units, loading: unitsLoading } = useSelector(
@@ -31,7 +32,21 @@ const AttendanceUploadModal = ({
   );
   console.log('units:', units);
   console.log('events:', events);
-  
+
+  const normFile = (e) => {
+  if (Array.isArray(e)) {
+    return e;
+  }
+  return e && e.fileList;
+};
+
+  // New: handle form submit and pass values to parent
+  const onFinish = (values) => {
+    // Attach file info to values
+    values.uploadFile = fileList && fileList.length > 0 ? fileList[0] : null;
+    handleUploadSubmit(values);
+  };
+
   return (
     <Modal
       title="Upload Attendance File"
@@ -43,17 +58,29 @@ const AttendanceUploadModal = ({
       style={{ maxWidth: 520 }}
       destroyOnClose
     >
-      <Form form={uploadForm} layout="vertical">
+      <Form form={uploadForm} layout="vertical" onFinish={onFinish}>
         <Form.Item
           label="Choose Event"
           name="event"
           rules={[{ required: true, message: 'Please select an event!' }]}
         >
-          <Select placeholder="Select an event" allowClear showSearch>
-            <Option value="event1">Event 1</Option>
-            <Option value="event2">Event 2</Option>
-            <Option value="event3">Event 3</Option>
-          </Select>
+          <Select
+                placeholder={eventsLoading ? 'Loading events...' : 'Select an event'}
+                allowClear
+                showSearch
+                loading={eventsLoading}
+                optionFilterProp="children"
+                notFoundContent={eventsLoading ? <Spin size="small" /> : 'No events found'}
+              >
+                {events?.map((event, index) => (
+                  <Option
+                    key={event.id ?? `event-${index}`}
+                    value={event.id ?? `event-${index}`}
+                  >
+                    {`${event.event_name} - ${new Date(event.start_date).toLocaleDateString('en-GB')}`}
+                  </Option>
+                ))}
+              </Select>
         </Form.Item>
 
         <Form.Item
@@ -61,28 +88,39 @@ const AttendanceUploadModal = ({
           name="unit"
           rules={[{ required: true, message: 'Please select a unit!' }]}
         >
-          <Select placeholder="Select a unit" allowClear showSearch>
-            <Option value="unit1">Unit 1</Option>
-            <Option value="unit2">Unit 2</Option>
-            <Option value="unit3">Unit 3</Option>
-          </Select>
+               <Select
+                placeholder={unitsLoading ? 'Loading units...' : 'Select a unit'}
+                allowClear
+                showSearch
+                loading={unitsLoading}
+                optionFilterProp="children"
+                notFoundContent={unitsLoading ? <Spin size="small" /> : 'No units found'}
+              >
+                {units?.map((unit, index) => (
+                  <Option
+                    key={unit.id ?? `unit-${index}`}
+                    value={unit.id ?? `unit-${index}`}
+                  >
+                    {`${unit.unit_id ?? unit.id} - ${unit.unit_name ?? unit.name}`}
+                  </Option>
+                ))}
+              </Select>
         </Form.Item>
 
-        <Form.Item
-          label="Upload File"
-          name="uploadFile"
-          rules={[{ required: true, message: 'Please upload a file!' }]}
-        >
-          <Upload
-            beforeUpload={() => false}
-            onChange={handleUploadChange}
-            fileList={fileList}
-            maxCount={1}
-            showUploadList
-          >
-            <Button icon={<UploadOutlined />}>Choose File</Button>
-          </Upload>
-        </Form.Item>
+       <Form.Item
+                   label="Upload Excel File"
+                   name="file"
+                   valuePropName="fileList"
+                   getValueFromEvent={normFile}
+                   rules={[{ required: true, message: 'Please upload an Excel file!' }]}
+                 >
+                   <Upload
+                     beforeUpload={() => false} // Prevent automatic upload
+                     accept=".xlsx, .xls"
+                   >
+                     <Button icon={<UploadOutlined />}>Click to Upload</Button>
+                   </Upload>
+                 </Form.Item>
 
         <Form.Item
           label="Date"
@@ -94,7 +132,7 @@ const AttendanceUploadModal = ({
 
         <Form.Item>
           <Row justify="center">
-            <Button type="primary" onClick={handleUploadSubmit}>
+            <Button type="primary" htmlType="submit">
               Submit
             </Button>
           </Row>

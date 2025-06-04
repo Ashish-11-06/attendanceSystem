@@ -14,6 +14,19 @@ export const fetchAttendance = createAsyncThunk(
   }
 );
 
+export const addAttendanceFile = createAsyncThunk(
+  'attendance/addAttendanceFile',
+  async (formData, { rejectWithValue }) => {
+    try {
+      const response = await attendanceAPIs.addAttendanceFile(formData);
+      return response.data;
+    } catch (error) {
+      console.error(error.response?.data);
+      return rejectWithValue(error.response?.data || 'Error fetching attendance');
+    }
+  }
+);
+
 const attendanceSlice = createSlice({
   name: 'attendance',
   initialState: {
@@ -39,6 +52,19 @@ const attendanceSlice = createSlice({
         state.data = action.payload;
       })
       .addCase(fetchAttendance.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.data = [];
+      })
+      .addCase(addAttendanceFile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addAttendanceFile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = action.payload;
+      })
+      .addCase(addAttendanceFile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
         state.data = [];

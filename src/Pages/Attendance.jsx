@@ -19,6 +19,7 @@ import { fetchAllUnits } from '../Redux/Slices/UnitSlice';
 import {
   fetchAttendance,
   clearAttendance,
+  addAttendanceFile,
 } from '../Redux/Slices/AttendanceSlice';
 import AttendanceUploadModal from '../components/Modals/AttendanceUploadModal';
 import { getVolunteerByUnitId } from '../Redux/Slices/VolinteerSlice';
@@ -118,20 +119,40 @@ const handleInTimeChange = (time, timeString, recordKey) => {
     setFileList([]);
   };
 
-  const handleUploadSubmit = () => {
+const handleUploadSubmit = async (values) => {
+  console.log('Attendance upload data to backend:', values);
+  console.log('Attendance upload data to backend file:', values.file);
 
-    uploadForm
-      .validateFields()
-      .then(() => {
-        alert('Upload submitted!');
-        setIsModalOpen(false);
-        uploadForm.resetFields();
-        setFileList([]);
-      })
-      .catch((info) => {
-        console.log('Validate Failed:', info);
-      });
-  };
+  const formData = new FormData();
+  // Get the uploaded Excel file (binary)
+  const fileObj = values.file?.[0]?.originFileObj;
+  const fileName = fileObj?.name;
+  // if (!fileObj) {
+  //   alert('Please upload an Excel file.');
+  //   return;
+  // }
+
+  // Append the binary file
+  formData.append('file', fileObj); // Key: "file"
+formData.append('file_name', fileName);
+  // Append other data fields (as string)
+  formData.append('event', String(values.event));
+  formData.append('unit', String(values.unit));
+
+  try {
+    const res = await dispatch(addAttendanceFile(formData));
+    console.log('Upload response:', res);
+
+    alert(res?.payload?.message || 'Attendance file uploaded successfully!');
+    setIsModalOpen(false);
+    uploadForm.resetFields();
+    setFileList([]);
+  } catch (error) {
+    console.error('Upload failed:', error);
+    alert('Upload failed. Please try again.');
+  }
+};
+
 
   // Apply filter based on dropdown selection
   const filteredVolunteers = volinteers?.filter((vol) => {
@@ -294,7 +315,10 @@ const handleInTimeChange = (time, timeString, recordKey) => {
       {showTable && (
         <>
           {attendanceError && (
-            <Alert message={attendanceError} type="error" style={{ marginBottom: 16 }} />
+            // Only show error if it's not HTML (e.g., not starting with '<')
+            !/^</.test(attendanceError) && (
+              <Alert message={attendanceError} type="error" style={{ marginBottom: 16 }} />
+            )
           )}
 
           <Row style={{ overflowX: 'auto' }}>
