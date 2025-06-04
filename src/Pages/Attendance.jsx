@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Select, Form, Row, Col, Table, Checkbox, Button, Input, Spin, Alert } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllEvents } from '../Redux/Slices/EventSlice';
 import { fetchAllUnits } from '../Redux/Slices/UnitSlice';
 import { fetchAttendance, clearAttendance } from '../Redux/Slices/AttendanceSlice';
 import AttendanceUploadModal from '../components/Modals/AttendanceUploadModal';
+import Download from './Download';
 
 const { Option } = Select;
 
 const Attendance = () => {
   const dispatch = useDispatch();
+  const downloadRef = useRef();
 
   const { events, loading: eventsLoading } = useSelector((state) => state.events);
   const { units, loading: unitsLoading } = useSelector((state) => state.units);
@@ -27,6 +29,10 @@ const Attendance = () => {
     dispatch(fetchAllEvents());
     dispatch(fetchAllUnits());
   }, [dispatch]);
+
+   const handlePrint = () => {
+  downloadRef.current?.print();
+  };
 
   const onValuesChange = (_, allValues) => {
     const { event, unit } = allValues;
@@ -114,6 +120,8 @@ const Attendance = () => {
           <h1>Mark Attendance</h1>
         </Col>
         <Col>
+         <Button onClick={handlePrint}>Download</Button>
+            <Download ref={downloadRef} />
           <Button type="primary" onClick={showModal}>
             Uploads
           </Button>
