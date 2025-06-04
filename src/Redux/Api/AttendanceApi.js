@@ -1,11 +1,8 @@
 import axiosInstance from "../axiosInstance";
 
 const attendanceAPIs = {
-  fetchAttendance: ({eventId,unitId}) =>
-    axiosInstance.post('/management/event-unit-attendance/', {
-      event: eventId,
-      unit: unitId,
-    }),
+  fetchAttendance: (payload) =>
+    axiosInstance.post('/management/event-unit-attendance/', payload),
 };
 
 export default attendanceAPIs;

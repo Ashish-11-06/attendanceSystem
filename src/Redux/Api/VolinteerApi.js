@@ -18,7 +18,10 @@ const volinteerAPIs = {
         }
       }
     );
-  }
+  },
+
+    getVolunteerByUnitId: (id) => axiosInstance.post(`/management/volunteers-by-unit/`, id),
+
 };
 
 export default volinteerAPIs;

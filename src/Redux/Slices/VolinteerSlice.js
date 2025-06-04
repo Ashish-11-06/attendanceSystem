@@ -29,6 +29,20 @@ export const addVolinteer = createAsyncThunk(
   }
 );
 
+// Thunk to add a new event
+export const getVolunteerByUnitId = createAsyncThunk(
+  'volinteers/getVolunteerByUnitId',
+  async (unitId, thunkAPI) => {
+    try {
+      const response = await volinteerAPIs.getVolunteerByUnitId(unitId);
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+
 // Update a volunteer
 export const updateVolinteer = createAsyncThunk(
   'volinteers/updateVolinteer',
@@ -93,6 +107,20 @@ const volineerSlice = createSlice({
         }
       })
       .addCase(updateVolinteer.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // .........
+      .addCase(getVolunteerByUnitId.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.volinteers = [];
+      })
+      .addCase(getVolunteerByUnitId.fulfilled, (state, action) => {
+        state.loading = false;
+        state.volinteers = action.payload;
+      })
+      .addCase(getVolunteerByUnitId.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
