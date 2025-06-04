@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Modal, Form, Select, Row, Col, Button, Upload, Spin, Alert } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Modal, Form, Select, Row, Col, Button, Upload, Spin, Alert, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchAllUnits } from '../../Redux/Slices/UnitSlice'; 
@@ -17,8 +17,10 @@ const normFile = (e) => {
 const AddVolunteerModal = ({ visible, onCancel }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
+const [successMsg, setSuccessMsg] = useState(null);
 
   const { units, loadingUnit, errorUnit } = useSelector((state) => state.units);
+console.log('units:', units);
 
   // Fetch units if not already in the store
   useEffect(() => {
@@ -27,28 +29,38 @@ const AddVolunteerModal = ({ visible, onCancel }) => {
     }
   }, [dispatch, units]);
 
-  const handleFinish = (values) => {
-    const formData = new FormData();
-    
-    // Check if a file was uploaded
-    if (values.file && values.file.length > 0) {
-      const file = values.file[0].originFileObj; // Access the actual file object
-      formData.append('file', file); // Append the actual file data
+const handleFinish = async (values) => {
+  const formData = new FormData();
+  if (values.file && values.file.length > 0) {
+    const file = values.file[0].originFileObj;
+    const unit_id = values.unit;
+    formData.append('file', file);
+    formData.append('unit_id', unit_id);
 
-      // Append unit_id as well
-      formData.append('unit_id', values.unit);
-
-      // Optional: Log FormData keys and values for debugging
-      for (let pair of formData.entries()) {
-        console.log(pair[0] + ': ', pair[1]);
-      }
-
-      dispatch(addVolinteer(formData));
-      form.resetFields();
-    } else {
-      console.error("No file uploaded");
+    try {
+      const res = await dispatch(addVolinteer(formData));
+      const msg = res?.payload?.message || 'Volunteer added successfully!';
+      
+      setSuccessMsg(msg);  // Set success message
+      form.resetFields();  // Reset form fields
+    } catch (error) {
+      console.error('Error adding volunteer:', error);
     }
-  };
+  } else {
+    console.error("No file uploaded");
+  }
+};
+
+// Auto-clear the alert after 3 seconds
+useEffect(() => {
+  if (successMsg) {
+    const timer = setTimeout(() => {
+      setSuccessMsg(null);
+      onCancel(); // Close modal after 3 seconds
+    }, 3000);
+    return () => clearTimeout(timer);
+  }
+}, [successMsg]);
 
   const handleCancel = () => {
     form.resetFields();
@@ -61,11 +73,19 @@ const AddVolunteerModal = ({ visible, onCancel }) => {
       open={visible}
       onCancel={handleCancel}
       footer={null}
-      destroyOnClose
       centered
       width="90%"
       style={{ maxWidth: 600 }}
     >
+      {successMsg && (
+  <Alert
+    message={successMsg}
+    type="success"
+    showIcon
+    style={{ marginBottom: '1rem' }}
+  />
+)}
+
       {loadingUnit ? (
         <Spin tip="Loading units..." />
       ) : errorUnit ? (
@@ -84,7 +104,7 @@ const AddVolunteerModal = ({ visible, onCancel }) => {
             <Select placeholder="Select a unit">
               {units.map((unit) => (
                 <Option key={unit.id} value={unit.id}>
-                  {unit.name}
+                  {unit.unit_name}
                 </Option>
               ))}
             </Select>

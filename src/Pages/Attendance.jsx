@@ -28,8 +28,9 @@ const Attendance = () => {
     dispatch(fetchAllUnits());
   }, [dispatch]);
 
-  const onValuesChange = (_, allValues) => {
-    const { event, unit } = allValues;
+const onValuesChange = (_, allValues) => {
+  const { event, unit } = allValues;
+  try {
     if (event && unit) {
       // event and unit here are event_id and unit_id respectively
       dispatch(fetchAttendance({ eventId: event, unitId: unit }));
@@ -38,7 +39,12 @@ const Attendance = () => {
       dispatch(clearAttendance());
       setShowTable(false);
     }
-  };
+  } catch (error) {
+    console.error("Error fetching or clearing attendance:", error);
+    // Optionally show user-friendly error message or reset state
+    setShowTable(false);
+  }
+};
 
   const handlePresentToggle = (checked, recordKey) => {
     // Optional: Implement local edit of attendance if needed
@@ -61,6 +67,7 @@ const Attendance = () => {
   };
 
   const handleUploadSubmit = () => {
+
     uploadForm
       .validateFields()
       .then(() => {

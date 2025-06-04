@@ -26,6 +26,12 @@ const { Title } = Typography;
 
 const Profile = () => {
   const navigate = useNavigate(); // Initialize navigate
+  const user = JSON.parse(localStorage.getItem('user'));
+
+  // Determine fields and labels based on user_type
+  const isAdmin = user?.user_type === 'admin';
+  const nameField = isAdmin ? 'admin_name' : 'unit_name';
+  const nameLabel = isAdmin ? 'Admin Name' : 'Unit Name';
 
   const [imageUrl, setImageUrl] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -33,10 +39,9 @@ const Profile = () => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   const [profileData, setProfileData] = useState({
-    name: 'Shrutika Desai',
-    phone: '+91-9876543210',
-    email: 'shrutika@example.com',
-    city: 'Pune',
+    email: user?.email || '',
+    [nameField]: user?.[nameField] || '',
+    user_type: user?.user_type || '',
   });
 
   useEffect(() => {
@@ -162,11 +167,11 @@ const Profile = () => {
               marginBottom: 20,
             }}
           >
-            {profileData.name}
+            {profileData[nameField]}
           </Title>
 
           <Descriptions
-            title="Contact Info"
+            title="Profile Info"
             bordered
             size={windowWidth < 480 ? 'small' : 'default'}
             column={1}
@@ -174,9 +179,9 @@ const Profile = () => {
             contentStyle={{ color: '#595959' }}
             style={{ width: '100%' }}
           >
-            <Descriptions.Item label="Phone">{profileData.phone}</Descriptions.Item>
             <Descriptions.Item label="Email">{profileData.email}</Descriptions.Item>
-            <Descriptions.Item label="City">{profileData.city}</Descriptions.Item>
+            <Descriptions.Item label={nameLabel}>{profileData[nameField]}</Descriptions.Item>
+            <Descriptions.Item label="User Type">{profileData.user_type}</Descriptions.Item>
           </Descriptions>
 
           <div
@@ -248,22 +253,6 @@ const Profile = () => {
       >
         <Form form={form} layout="vertical">
           <Form.Item
-            name="name"
-            label="Full Name"
-            rules={[{ required: true, message: 'Please enter your name' }]}
-          >
-            <Input placeholder="Enter name" />
-          </Form.Item>
-
-          <Form.Item
-            name="phone"
-            label="Phone"
-            rules={[{ required: true, message: 'Please enter your phone number' }]}
-          >
-            <Input placeholder="Enter phone" />
-          </Form.Item>
-
-          <Form.Item
             name="email"
             label="Email"
             rules={[
@@ -273,13 +262,19 @@ const Profile = () => {
           >
             <Input placeholder="Enter email" />
           </Form.Item>
-
           <Form.Item
-            name="city"
-            label="City"
-            rules={[{ required: true, message: 'Please enter your city' }]}
+            name={nameField}
+            label={nameLabel}
+            rules={[{ required: true, message: `Please enter ${nameLabel.toLowerCase()}` }]}
           >
-            <Input placeholder="Enter city" />
+            <Input placeholder={`Enter ${nameLabel.toLowerCase()}`} />
+          </Form.Item>
+          <Form.Item
+            name="user_type"
+            label="User Type"
+            rules={[{ required: true, message: 'Please enter user type' }]}
+          >
+            <Input placeholder="Enter user type" />
           </Form.Item>
         </Form>
       </Modal>

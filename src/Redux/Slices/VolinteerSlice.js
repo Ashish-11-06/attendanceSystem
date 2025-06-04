@@ -17,9 +17,11 @@ export const fetchAllVolinteer = createAsyncThunk(
 // Thunk to add a new event
 export const addVolinteer = createAsyncThunk(
   'volinteers/addvolinteer',
-  async (newVolinteer, thunkAPI) => {
+  async (formData, thunkAPI) => {
     try {
-      const response = await volinteerAPIs.addVolunteer(newVolinteer);
+      const response = await volinteerAPIs.addVolunteer(formData);
+      console.log('addVolinteer response:', response);
+      
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data || error.message);

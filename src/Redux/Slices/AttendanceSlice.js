@@ -3,9 +3,9 @@ import attendanceAPIs from '../Api/AttendanceApi';
 
 export const fetchAttendance = createAsyncThunk(
   'attendance/fetchAttendance',
-  async ({ unitId }, { rejectWithValue }) => {
+  async ({ eventId,unitId }, { rejectWithValue }) => {
     try {
-      const response = await attendanceAPIs.fetchAttendance(unitId);
+      const response = await attendanceAPIs.fetchAttendance({eventId,unitId});
       return response.data;
     } catch (error) {
       console.error(error.response?.data);
