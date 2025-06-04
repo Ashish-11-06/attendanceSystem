@@ -22,18 +22,34 @@ const Attendance = () => {
   const [showTable, setShowTable] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fileList, setFileList] = useState([]);
+  const [localAttendance, setLocalAttendance] = useState([]);
 
   useEffect(() => {
     dispatch(fetchAllEvents());
     dispatch(fetchAllUnits());
   }, [dispatch]);
 
+  useEffect(() => {
+    if (attendanceData && attendanceData.length > 0) {
+      const dataWithKeys = attendanceData.map((item) => ({
+        ...item,
+        key: item.id,
+        present: item.present ?? false,
+        remark: item.remark ?? '',
+      }));
+      setLocalAttendance(dataWithKeys);
+      setShowTable(true);
+    } else {
+      setLocalAttendance([]);
+      setShowTable(false);
+    }
+  }, [attendanceData]);
+
   const onValuesChange = (_, allValues) => {
     const { event, unit } = allValues;
     if (event && unit) {
-      // event and unit here are event_id and unit_id respectively
-      dispatch(fetchAttendance({ eventId: event, unitId: unit }));
-      setShowTable(true);
+      // For now, fetch data using static ID (e.g., id: 2)
+      dispatch(fetchAttendance({ id: 2 }));
     } else {
       dispatch(clearAttendance());
       setShowTable(false);
@@ -41,16 +57,24 @@ const Attendance = () => {
   };
 
   const handlePresentToggle = (checked, recordKey) => {
-    // Optional: Implement local edit of attendance if needed
+    setLocalAttendance((prev) =>
+      prev.map((item) =>
+        item.key === recordKey ? { ...item, present: checked } : item
+      )
+    );
   };
 
   const handleRemarkChange = (value, recordKey) => {
-    // Optional: Implement local edit of remark if needed
+    setLocalAttendance((prev) =>
+      prev.map((item) =>
+        item.key === recordKey ? { ...item, remark: value } : item
+      )
+    );
   };
 
   const handleSubmitAttendance = () => {
     alert('Attendance submitted!');
-    console.log('Submitted attendance data:', attendanceData);
+    console.log('Submitted attendance data:', localAttendance);
   };
 
   const showModal = () => setIsModalOpen(true);
@@ -75,11 +99,13 @@ const Attendance = () => {
   };
 
   const columns = [
-    { title: 'ATD_ID', dataIndex: 'atdId', key: 'atdId', ellipsis: true },
-    { title: 'Name', dataIndex: 'name', key: 'name', ellipsis: true },
-    { title: 'Gender', dataIndex: 'gender', key: 'gender', ellipsis: true },
-    { title: 'Email', dataIndex: 'email', key: 'email', ellipsis: true },
-    { title: 'Mobile', dataIndex: 'mobile', key: 'mobile', ellipsis: true },
+    { title: 'ATD_ID', dataIndex: 'atd_id', key: 'atd_id' },
+    { title: 'Name', dataIndex: ['volunteer', 'name'], key: 'name' },
+    { title: 'Gender', dataIndex: ['volunteer', 'gender'], key: 'gender' },
+    { title: 'Email', dataIndex: ['volunteer', 'email'], key: 'email' },
+    { title: 'Phone', dataIndex: ['volunteer', 'phone'], key: 'phone' },
+    { title: 'Unit Name', dataIndex: ['volunteer', 'unit', 'unit_name'], key: 'unit_name' },
+    { title: 'Event Name', dataIndex: ['event', 'event_name'], key: 'event_name' },
     {
       title: 'Present / Absent',
       dataIndex: 'present',
@@ -110,13 +136,9 @@ const Attendance = () => {
   return (
     <div style={{ padding: '16px' }}>
       <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
+        <Col><h1>Mark Attendance</h1></Col>
         <Col>
-          <h1>Mark Attendance</h1>
-        </Col>
-        <Col>
-          <Button type="primary" onClick={showModal}>
-            Uploads
-          </Button>
+          <Button type="primary" onClick={showModal}>Uploads</Button>
         </Col>
       </Row>
 
@@ -136,18 +158,11 @@ const Attendance = () => {
                 optionFilterProp="children"
                 notFoundContent={eventsLoading ? <Spin size="small" /> : 'No events found'}
               >
-                {events && events.length > 0 ? (
-                  events.map((event, index) => (
-                    <Option
-                      key={event.event_id ?? `event-${index}`}
-                      value={event.event_id ?? `event-${index}`}
-                    >
-                      {`${event.event_name} - ${new Date(event.start_date).toLocaleDateString('en-GB')}`}
-                    </Option>
-                  ))
-                ) : (
-                  <Option disabled>No events available</Option>
-                )}
+                {events?.map((event, index) => (
+                  <Option key={event.event_id ?? index} value={event.event_id ?? index}>
+                    {`${event.event_name} - ${new Date(event.start_date).toLocaleDateString('en-GB')}`}
+                  </Option>
+                ))}
               </Select>
             </Form.Item>
           </Col>
@@ -166,18 +181,11 @@ const Attendance = () => {
                 optionFilterProp="children"
                 notFoundContent={unitsLoading ? <Spin size="small" /> : 'No units found'}
               >
-                {units && units.length > 0 ? (
-                  units.map((unit, index) => (
-                    <Option
-                      key={unit.unit_id ?? unit.id ?? `unit-${index}`}
-                      value={unit.unit_id ?? unit.id ?? `unit-${index}`}
-                    >
-                      {`${unit.unit_id ?? unit.id} - ${unit.unit_name ?? unit.name}`}
-                    </Option>
-                  ))
-                ) : (
-                  <Option disabled>No units available</Option>
-                )}
+                {units?.map((unit, index) => (
+                  <Option key={unit.id ?? index} value={unit.id ?? index}>
+                    {`${unit.unit_id} - ${unit.unit_name ?? unit.name}`}
+                  </Option>
+                ))}
               </Select>
             </Form.Item>
           </Col>
@@ -186,14 +194,16 @@ const Attendance = () => {
 
       {showTable && (
         <>
-          {attendanceError && <Alert message={attendanceError} type="error" style={{ marginBottom: 16 }} />}
+          {attendanceError && (
+            <Alert message={attendanceError} type="error" style={{ marginBottom: 16 }} />
+          )}
           <Row style={{ overflowX: 'auto' }}>
             <Col span={24}>
               <Table
-                dataSource={attendanceData}
+                dataSource={localAttendance}
                 columns={columns}
                 pagination={false}
-                rowKey={(record) => record.key || record.atdId || record.id || Math.random()}
+                rowKey={(record) => record.key}
                 size="middle"
                 loading={attendanceLoading}
                 scroll={{ x: true }}

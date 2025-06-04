@@ -1,11 +1,12 @@
+// Redux Slices/AttendanceSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import attendanceAPIs from '../Api/AttendanceApi';
 
 export const fetchAttendance = createAsyncThunk(
   'attendance/fetchAttendance',
-  async ({ unitId }, { rejectWithValue }) => {
+  async (id, { rejectWithValue }) => {
     try {
-      const response = await attendanceAPIs.fetchAttendance(unitId);
+      const response = await attendanceAPIs.fetchAttendance(id);
       return response.data;
     } catch (error) {
       console.error(error.response?.data);
@@ -13,6 +14,8 @@ export const fetchAttendance = createAsyncThunk(
     }
   }
 );
+
+
 
 const attendanceSlice = createSlice({
   name: 'attendance',
@@ -47,5 +50,4 @@ const attendanceSlice = createSlice({
 });
 
 export const { clearAttendance } = attendanceSlice.actions;
-
 export default attendanceSlice.reducer;

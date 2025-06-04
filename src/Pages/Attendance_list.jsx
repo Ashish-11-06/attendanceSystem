@@ -1,13 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect , useRef} from 'react';
 import { Table, Tag, Button, Select, Spin, message } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllEvents } from '../Redux/Slices/EventSlice';
 import { fetchAllUnits } from '../Redux/Slices/UnitSlice';
 import { fetchAllVolinteer } from '../Redux/Slices/VolinteerSlice';
+import Download from './Download';
 
 const Attendance_list = () => {
   const dispatch = useDispatch();
+  const downloadRef = useRef()
+
+  const handlePrint = () => {
+  downloadRef.current?.print();
+};
 
   const { events, loading: eventsLoading, error: eventsError } = useSelector((state) => state.events);
   const { units, loading: unitsLoading, error: unitsError } = useSelector((state) => state.units);
@@ -135,6 +141,10 @@ const Attendance_list = () => {
         >
           Download
         </Button>
+
+
+        <Button onClick={handlePrint}>Download Report</Button>
+            <Download ref={downloadRef} />
       </div>
 
       <div
