@@ -5,14 +5,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllEvents } from '../Redux/Slices/EventSlice';
 import { fetchAllUnits } from '../Redux/Slices/UnitSlice';
 import { fetchAllVolinteer } from '../Redux/Slices/VolinteerSlice';
+import { fetchAttendance } from '../Redux/Slices/AttendanceSlice';
+import { title } from 'framer-motion/client';
 
 const Attendance_list = () => {
   const dispatch = useDispatch();
 
   const { events, loading: eventsLoading, error: eventsError } = useSelector((state) => state.events);
   const { units, loading: unitsLoading, error: unitsError } = useSelector((state) => state.units);
-  const { volinteers, loading: volunteerLoading, error: volunteerError } = useSelector((state) => state.volinteers);
+  const {  loading: volunteerLoading, error: volunteerError } = useSelector((state) => state.attendance);
 
+  const [ attendance, setAttendance ] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
@@ -24,26 +27,36 @@ const Attendance_list = () => {
   }, [dispatch]);
 
   // Fetch volunteers only if both event and unit are selected
-  useEffect(() => {
+useEffect(() => {
+  const getAttendance = async () => {
     if (selectedEvent && selectedUnit) {
-      dispatch(fetchAllVolinteer({ eventId: selectedEvent, unitId: selectedUnit }));
+      try {
+        const response = await dispatch(
+          fetchAttendance({ event: selectedEvent, unit: selectedUnit })
+        );
+        if (response.payload) {
+          setAttendance(response.payload);
+        }
+      } catch (error) {
+        console.error('Failed to fetch attendance:', error);
+      }
     }
-  }, [dispatch, selectedEvent, selectedUnit]);
+  };
 
-  useEffect(() => {
-    if (eventsError) message.error(`Failed to load events: ${eventsError}`);
-    if (unitsError) message.error(`Failed to load units: ${unitsError}`);
-    if (volunteerError) message.error(`Failed to load volunteers: ${volunteerError}`);
-  }, [eventsError, unitsError, volunteerError]);
+  getAttendance();
+}, [dispatch, selectedEvent, selectedUnit]);
+
+
+  console.log(attendance);
 
   // Prepare table data only if both selected
   const tableData =
     selectedEvent && selectedUnit
-      ? volinteers.map((v, index) => ({
+      ? attendance?.map((v, index) => ({
           key: v.id || index,
           atdId: v.atdId || `ATD${index + 1}`,
           volunteerId: v.volunteer_id || v.id,
-          eventId: v.eventId || '-',
+          // event: v.event || '-',
           unitId: v.unit_id || (v.unit && v.unit.unit_id) || '-',
           date: v.date || '-',
           inTime: v.inTime || '-',
@@ -53,14 +66,32 @@ const Attendance_list = () => {
         }))
       : [];
 
+      console.log(tableData);
+
   const columns = [
-    { title: 'ATD_ID', dataIndex: 'atdId', key: 'atdId' },
-    { title: 'Volunteer ID', dataIndex: 'volunteerId', key: 'volunteerId' },
-    { title: 'Event ID', dataIndex: 'eventId', key: 'eventId' },
-    { title: 'Unit ID', dataIndex: 'unitId', key: 'unitId' },
+    { title: 'ATD_ID', dataIndex: 'atd_id', key: 'atdId' },
+     {
+  title: 'Volunteer ID',
+  dataIndex: 'volunteer',
+  key: 'volunteerId',
+  render: (volunteer) => volunteer?.volunteer_id ?? 'N/A',
+},
+ 
+    {
+  title: 'Event ID',
+  dataIndex: 'event', // keep this as the root object
+  key: 'eventId',
+  render: (event) => event?.event_id?? 'N/A',
+},
+    {
+      title: 'Unit ID',
+      dataIndex: 'volunteer',
+      key: 'unitId',
+      render: (volunteer) => volunteer?.unit?.unit_id || 'N/A',
+    },
     { title: 'Date', dataIndex: 'date', key: 'date' },
-    { title: 'In Time', dataIndex: 'inTime', key: 'inTime' },
-    { title: 'Out Time', dataIndex: 'outTime', key: 'outTime' },
+    { title: 'In Time', dataIndex: 'in_time', key: 'in_time' },
+    { title: 'Out Time', dataIndex: 'out_time', key: 'out_time' },
     {
       title: 'Present / Absent',
       dataIndex: 'present',
@@ -131,7 +162,7 @@ const Attendance_list = () => {
           icon={<DownloadOutlined />}
           onClick={handleDownload}
           style={{ minWidth: 120 }}
-          disabled={tableData.length === 0}
+          disabled={tableData?.length === 0}
         >
           Download
         </Button>
@@ -237,8 +268,8 @@ const Attendance_list = () => {
             >
               {units.map((unit) => (
                 <Select.Option
-                  key={unit.unit_id || unit.id}
-                  value={unit.unit_id || unit.id}
+                  key={unit.id}
+                  value={unit.id}
                 >
                   <div
                     style={{
@@ -262,7 +293,7 @@ const Attendance_list = () => {
       {selectedEvent && selectedUnit ? (
         <Spin spinning={volunteerLoading}>
           <Table
-            dataSource={tableData}
+            dataSource={attendance}
             columns={columns}
             pagination={{
               current: pagination.current,

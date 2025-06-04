@@ -28,17 +28,21 @@ const Attendance = () => {
     dispatch(fetchAllUnits());
   }, [dispatch]);
 
-  const onValuesChange = (_, allValues) => {
-    const { event, unit } = allValues;
-    if (event && unit) {
-      // event and unit here are event_id and unit_id respectively
-      dispatch(fetchAttendance({ eventId: event, unitId: unit }));
-      setShowTable(true);
-    } else {
-      dispatch(clearAttendance());
-      setShowTable(false);
-    }
-  };
+const onValuesChange = (_, allValues) => {
+  if (allValues?.event && allValues?.unit) {
+    const payload = {
+      event: allValues.event,
+      unit: allValues.unit,
+    };
+    console.log('Fetching attendance with:', payload);
+    // dispatch(fetchAttendance(payload));
+    setShowTable(true);
+  } else {
+    // dispatch(clearAttendance());
+    setShowTable(false);
+  }
+};
+
 
   const handlePresentToggle = (checked, recordKey) => {
     // Optional: Implement local edit of attendance if needed
@@ -139,8 +143,8 @@ const Attendance = () => {
                 {events && events.length > 0 ? (
                   events.map((event, index) => (
                     <Option
-                      key={event.event_id ?? `event-${index}`}
-                      value={event.event_id ?? `event-${index}`}
+                      key={event.id ?? `event-${index}`}
+                      value={event.id ?? `event-${index}`}
                     >
                       {`${event.event_name} - ${new Date(event.start_date).toLocaleDateString('en-GB')}`}
                     </Option>
@@ -169,8 +173,8 @@ const Attendance = () => {
                 {units && units.length > 0 ? (
                   units.map((unit, index) => (
                     <Option
-                      key={unit.unit_id ?? unit.id ?? `unit-${index}`}
-                      value={unit.unit_id ?? unit.id ?? `unit-${index}`}
+                      key={unit.id ?? `unit-${index}`}
+                      value={unit.id ?? `unit-${index}`}
                     >
                       {`${unit.unit_id ?? unit.id} - ${unit.unit_name ?? unit.name}`}
                     </Option>
@@ -186,7 +190,7 @@ const Attendance = () => {
 
       {showTable && (
         <>
-          {attendanceError && <Alert message={attendanceError} type="error" style={{ marginBottom: 16 }} />}
+          {attendanceError && <Alert message={attendanceError.error} type="error" style={{ marginBottom: 16 }} />}
           <Row style={{ overflowX: 'auto' }}>
             <Col span={24}>
               <Table
