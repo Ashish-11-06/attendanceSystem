@@ -39,26 +39,31 @@ const EventList = () => {
     }
   }, [error]);
 
-    const [pagination, setPagination] = useState({
-      current: 1,
-      pageSize: 10,
-    });
-  
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+  });
+
 
   // 🔍 Filter events
-  const filteredData = events.filter(({ event_name,location, date }) => {
+  const filteredData = events.filter(({ event_name, location, start_date }) => {
     const matchesText =
       event_name.toLowerCase().includes(searchText.toLowerCase()) ||
-    location.city?.toLowerCase().includes(searchText.toLowerCase()) ||
- location.address?.toLowerCase().includes(searchText.toLowerCase()) ||
-  location.state?.toLowerCase().includes(searchText.toLowerCase());
+      location.some(
+        (loc) =>
+          loc.city?.toLowerCase().includes(searchText.toLowerCase()) ||
+          loc.address?.toLowerCase().includes(searchText.toLowerCase()) ||
+          loc.state?.toLowerCase().includes(searchText.toLowerCase())
+      );
 
     const matchesDate = selectedDate
-      ? dayjs(date, 'YYYY-MM-DD').isSame(selectedDate, 'day')
+      ? dayjs(start_date, 'YYYY-MM-DD').isSame(selectedDate, 'day') ||
+      (end_date && dayjs(end_date, 'YYYY-MM-DD').isSame(selectedDate, 'day'))
       : true;
 
     return matchesText && matchesDate;
   });
+
 
   const columns = [
     {
@@ -74,20 +79,36 @@ const EventList = () => {
       key: 'eventName',
     },
     {
-      title: 'Location',
-      dataIndex: 'location',
-      key: 'location',
-      render: (location) =>
-        location
-          ? `${location.address}, ${location.city}, ${location.state}`
-          : 'N/A',
+  title: 'Location',
+  dataIndex: 'location',
+  key: 'location',
+  render: (locations) => {
+    if (!locations || locations.length === 0) return 'N/A';
+
+    return (
+      <div>
+        {locations.map((loc, index) => (
+          <div key={index}>
+            {index + 1}. {loc.address}, {loc.city}, {loc.state}.
+          </div>
+        ))}
+      </div>
+    );
+  },
+},
+    {
+      title: 'Start Date',
+      dataIndex: 'start_date',
+      key: 'start_date',
+      render: (text) => text ? dayjs(text).format('DD-MM-YYYY') : '-',
+      sorter: (a, b) => new Date(a.start_date) - new Date(b.start_date),
     },
     {
-      title: 'Date',
-      dataIndex: 'date',
-      key: 'date',
-      render: (text) => dayjs(text).format('DD-MM-YYYY'),
-      sorter: (a, b) => new Date(a.date) - new Date(b.date),
+      title: 'End Date',
+      dataIndex: 'end_date',
+      key: 'end_date',
+      render: (text) => text ? dayjs(text).format('DD-MM-YYYY') : '-',
+      sorter: (a, b) => new Date(a.end_date || 0) - new Date(b.end_date || 0),
     },
     {
       title: 'Time',
@@ -181,36 +202,35 @@ const EventList = () => {
       >
         {/* {loading ? ( */}
         <Spin spinning={loading} size='large' tip="Loading Events...">
-     
-          <Table
-              dataSource={filteredData}
-              columns={columns}
-              pagination={{
-                current: pagination.current,
-                pageSize: pagination.pageSize,
-                total: filteredData.length,
-                showSizeChanger: false,
-              }}
-              onChange={(paginationInfo) => {
-                setPagination({
-                  ...pagination,
-                  current: paginationInfo.current,
-                });
-              }}
-              bordered
-              size="small"
-              scroll={{ x: 'max-content' }}
-              rowKey={(record, index) => index}
-            />
 
-          </Spin>
-        
+          <Table
+            dataSource={filteredData}
+            columns={columns}
+            pagination={{
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              total: filteredData.length,
+              showSizeChanger: false,
+            }}
+            onChange={(paginationInfo) => {
+              setPagination({
+                ...pagination,
+                current: paginationInfo.current,
+              });
+            }}
+            bordered
+            size="small"
+            scroll={{ x: 'max-content' }}
+            rowKey={(record, index) => index}
+          />
+
+        </Spin>
+
       </div>
 
       <AddEventModal
         visible={isModalVisible}
         onCancel={handleCancel}
-        onFinish={onFinish}
         form={form}
       />
 
