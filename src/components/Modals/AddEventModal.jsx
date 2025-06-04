@@ -21,7 +21,8 @@ const AddEventModal = ({ visible, onCancel, form }) => {
             event_id: 1,
             event_name: values.eventName,
             location: values.location,
-            date: values.date.format('YYYY-MM-DD'),
+            start_date: values.start_date.format('YYYY-MM-DD'),
+            end_date: values.end_date.format('YYYY-MM-DD'),
             time: values.time.format('HH:mm:ss'),
         };
 
@@ -64,16 +65,17 @@ const AddEventModal = ({ visible, onCancel, form }) => {
                 </Form.Item>
 
                 <Form.Item
-                    label="Location"
+                    label="Location(s)"
                     name="location"
-                    rules={[{ required: true, message: 'Please select location' }]}
+                    rules={[{ required: true, message: 'Please select at least one location' }]}
                 >
                     {loading ? (
                         <Spin />
                     ) : (
                         <Select
+                            mode="multiple"  // ✅ Allow multiple selection
                             showSearch
-                            placeholder="Select location"
+                            placeholder="Select location(s)"
                             optionFilterProp="label"
                             filterOption={(input, option) =>
                                 option.label.toLowerCase().includes(input.toLowerCase())
@@ -82,19 +84,27 @@ const AddEventModal = ({ visible, onCancel, form }) => {
                             {locations?.map((loc) => {
                                 const label = `${loc.address}, ${loc.city}, ${loc.state}`;
                                 return (
-                                    <Option key={loc.id} value={loc.name} label={label}>
+                                    <Option key={loc.id} value={loc.id} label={label}>
                                         {label}
                                     </Option>
                                 );
                             })}
                         </Select>
 
+
                     )}
                 </Form.Item>
 
                 <Form.Item
-                    label="Date"
-                    name="date"
+                    label="Start Date"
+                    name="start_date"
+                    rules={[{ required: true, message: 'Please select date' }]}
+                >
+                    <DatePicker style={{ width: '100%' }} />
+                </Form.Item>
+                 <Form.Item
+                    label="End Date"
+                    name="end_date"
                     rules={[{ required: true, message: 'Please select date' }]}
                 >
                     <DatePicker style={{ width: '100%' }} />
