@@ -1,72 +1,51 @@
-import React, { useState } from 'react';
-import {
-  Select,
-  Form,
-  Row,
-  Col,
-  Table,
-  Checkbox,
-  Button,
-  Input,
-} from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Select, Form, Row, Col, Table, Checkbox, Button, Input, Spin, Alert } from 'antd';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchAllEvents } from '../Redux/Slices/EventSlice';
+import { fetchAllUnits } from '../Redux/Slices/UnitSlice';
+import { fetchAttendance, clearAttendance } from '../Redux/Slices/AttendanceSlice';
 import AttendanceUploadModal from '../components/Modals/AttendanceUploadModal';
 
 const { Option } = Select;
 
 const Attendance = () => {
+  const dispatch = useDispatch();
+
+  const { events, loading: eventsLoading } = useSelector((state) => state.events);
+  const { units, loading: unitsLoading } = useSelector((state) => state.units);
+  const { data: attendanceData, loading: attendanceLoading, error: attendanceError } = useSelector(
+    (state) => state.attendance
+  );
+
   const [form] = Form.useForm();
   const [uploadForm] = Form.useForm();
-  const [attendanceData, setAttendanceData] = useState([]);
   const [showTable, setShowTable] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fileList, setFileList] = useState([]);
 
+  useEffect(() => {
+    dispatch(fetchAllEvents());
+    dispatch(fetchAllUnits());
+  }, [dispatch]);
+
   const onValuesChange = (_, allValues) => {
-    if (allValues.event && allValues.unit) {
-      const mockData = [
-        {
-          key: '1',
-          atdId: 'ATD001',
-          name: 'John Doe',
-          gender: 'Male',
-          email: 'john@example.com',
-          mobile: '1234567890',
-          present: true,
-          remark: '',
-        },
-        {
-          key: '2',
-          atdId: 'ATD002',
-          name: 'Jane Smith',
-          gender: 'Female',
-          email: 'jane@example.com',
-          mobile: '0987654321',
-          present: false,
-          remark: '',
-        },
-      ];
-      setAttendanceData(mockData);
+    const { event, unit } = allValues;
+    if (event && unit) {
+      // event and unit here are event_id and unit_id respectively
+      dispatch(fetchAttendance({ eventId: event, unitId: unit }));
       setShowTable(true);
     } else {
+      dispatch(clearAttendance());
       setShowTable(false);
-      setAttendanceData([]);
     }
   };
 
   const handlePresentToggle = (checked, recordKey) => {
-    setAttendanceData((prevData) =>
-      prevData.map((item) =>
-        item.key === recordKey ? { ...item, present: checked } : item
-      )
-    );
+    // Optional: Implement local edit of attendance if needed
   };
 
   const handleRemarkChange = (value, recordKey) => {
-    setAttendanceData((prevData) =>
-      prevData.map((item) =>
-        item.key === recordKey ? { ...item, remark: value } : item
-      )
-    );
+    // Optional: Implement local edit of remark if needed
   };
 
   const handleSubmitAttendance = () => {
@@ -149,23 +128,56 @@ const Attendance = () => {
               name="event"
               rules={[{ required: true, message: 'Please select an event!' }]}
             >
-              <Select placeholder="Select an event" allowClear showSearch>
-                <Option value="event1">Event 1</Option>
-                <Option value="event2">Event 2</Option>
-                <Option value="event3">Event 3</Option>
+              <Select
+                placeholder={eventsLoading ? 'Loading events...' : 'Select an event'}
+                allowClear
+                showSearch
+                loading={eventsLoading}
+                optionFilterProp="children"
+                notFoundContent={eventsLoading ? <Spin size="small" /> : 'No events found'}
+              >
+                {events && events.length > 0 ? (
+                  events.map((event, index) => (
+                    <Option
+                      key={event.event_id ?? `event-${index}`}
+                      value={event.event_id ?? `event-${index}`}
+                    >
+                      {`${event.event_name} - ${new Date(event.start_date).toLocaleDateString('en-GB')}`}
+                    </Option>
+                  ))
+                ) : (
+                  <Option disabled>No events available</Option>
+                )}
               </Select>
             </Form.Item>
           </Col>
+
           <Col xs={24} sm={12}>
             <Form.Item
               label="Choose Unit"
               name="unit"
               rules={[{ required: true, message: 'Please select a unit!' }]}
             >
-              <Select placeholder="Select a unit" allowClear showSearch>
-                <Option value="unit1">Unit 1</Option>
-                <Option value="unit2">Unit 2</Option>
-                <Option value="unit3">Unit 3</Option>
+              <Select
+                placeholder={unitsLoading ? 'Loading units...' : 'Select a unit'}
+                allowClear
+                showSearch
+                loading={unitsLoading}
+                optionFilterProp="children"
+                notFoundContent={unitsLoading ? <Spin size="small" /> : 'No units found'}
+              >
+                {units && units.length > 0 ? (
+                  units.map((unit, index) => (
+                    <Option
+                      key={unit.unit_id ?? unit.id ?? `unit-${index}`}
+                      value={unit.unit_id ?? unit.id ?? `unit-${index}`}
+                    >
+                      {`${unit.unit_id ?? unit.id} - ${unit.unit_name ?? unit.name}`}
+                    </Option>
+                  ))
+                ) : (
+                  <Option disabled>No units available</Option>
+                )}
               </Select>
             </Form.Item>
           </Col>
@@ -174,28 +186,29 @@ const Attendance = () => {
 
       {showTable && (
         <>
+          {attendanceError && <Alert message={attendanceError} type="error" style={{ marginBottom: 16 }} />}
           <Row style={{ overflowX: 'auto' }}>
             <Col span={24}>
               <Table
                 dataSource={attendanceData}
                 columns={columns}
                 pagination={false}
-                rowKey="key"
+                rowKey={(record) => record.key || record.atdId || record.id || Math.random()}
                 size="middle"
+                loading={attendanceLoading}
                 scroll={{ x: true }}
               />
             </Col>
           </Row>
 
           <Row justify="center" style={{ marginTop: 24 }}>
-            <Button type="primary" onClick={handleSubmitAttendance}>
+            <Button type="primary" onClick={handleSubmitAttendance} disabled={attendanceLoading}>
               Submit
             </Button>
           </Row>
         </>
       )}
 
-      {/* Separate Modal Component */}
       <AttendanceUploadModal
         isModalOpen={isModalOpen}
         handleCancel={handleCancel}
