@@ -10,6 +10,7 @@ import {
   Row,
 } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
+import { useSelector } from 'react-redux';
 
 const { Option } = Select;
 
@@ -22,7 +23,15 @@ const AttendanceUploadModal = ({
   setFileList,
 }) => {
   const handleUploadChange = ({ fileList }) => setFileList(fileList.slice(-1));
-
+ const { events, loading: eventsLoading } = useSelector(
+    (state) => state.events
+  );
+  const { units, loading: unitsLoading } = useSelector(
+    (state) => state.units
+  );
+  console.log('units:', units);
+  console.log('events:', events);
+  
   return (
     <Modal
       title="Upload Attendance File"

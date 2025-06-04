@@ -35,6 +35,8 @@ const Attendance = () => {
   const { units, loading: unitsLoading } = useSelector(
     (state) => state.units
   );
+  console.log('units:', events);
+  
   const {
     volinteers,
     loading: attendanceLoading,
@@ -58,6 +60,7 @@ const Attendance = () => {
     if (allValues?.event && allValues?.unit) {
       const payload = {
         unit: allValues.unit,
+        event: allValues.event, // send events.id instead of events.event_id
       };
       dispatch(getVolunteerByUnitId(payload));
       setShowTable(true);
@@ -114,6 +117,7 @@ const handleInTimeChange = (time, timeString, recordKey) => {
   };
 
   const handleUploadSubmit = () => {
+
     uploadForm
       .validateFields()
       .then(() => {

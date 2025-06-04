@@ -26,7 +26,16 @@ const EventList = () => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    dispatch(fetchAllEvents());
+    const fetchEvents = async () => {
+      try {
+        const res = await dispatch(fetchAllEvents()).unwrap();
+        console.log('res', res);
+      } catch (err) {
+        console.error('Failed to fetch events:', err);
+        // message.error('Failed to load events. Please try again later.');
+      }
+    }
+    fetchEvents();
   }, [dispatch]);
 
   useEffect(() => {
@@ -40,7 +49,7 @@ const EventList = () => {
     pageSize: 10,
   });
 
-  const filteredData = events.filter(({ event_name, location, start_date, end_date }) => {
+  const filteredData = (Array.isArray(events) ? events : []).filter(({ event_name, location, start_date, end_date }) => {
     const matchesText =
       event_name.toLowerCase().includes(searchText.toLowerCase()) ||
       location.some(
@@ -72,15 +81,15 @@ const EventList = () => {
     },
     {
       title: 'Location',
-      dataIndex: 'location',
+      dataIndex: 'locations', // <-- changed from 'location' to 'locations'
       key: 'location',
       render: (locations) => {
-        if (!locations || locations.length === 0) return 'N/A';
+        if (!Array.isArray(locations) || locations.length === 0) return 'N/A';
         return (
           <div>
             {locations.map((loc, index) => (
               <div key={index}>
-                {index + 1}. {loc.address}, {loc.city}, {loc.state}.
+                {loc.address}, {loc.city}, {loc.state}
               </div>
             ))}
           </div>

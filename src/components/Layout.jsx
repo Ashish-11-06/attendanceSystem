@@ -22,7 +22,8 @@ const AppLayout = ({ children }) => {
   const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-
+    const user = JSON.parse(localStorage.getItem('user'));
+  const username = user?.user_type === 'admin' ? user.admin_name : user.unit_name || 'user';
   const menuItems = [
     { key: '/', icon: <DashboardOutlined />, label: 'Dashboard' },
     { key: '/events-list', icon: <CalendarOutlined />, label: 'Event List' },
@@ -193,7 +194,7 @@ const AppLayout = ({ children }) => {
 
          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ fontWeight: 500 }}>
-              {/* Welcome, {user.user_type === "admin" ? user.admin_name : user.unit_name || "user"} */}Welcome,User
+              {/* Welcome, {user.user_type === "admin" ? user.admin_name : user.unit_name || "user"} */}Welcome, {username}
             </span>
             <Avatar size="large" icon={<SmileOutlined />} />
       </div>
