@@ -35,7 +35,7 @@ const handleFinish = async (values) => {
     const file = values.file[0].originFileObj;
     const unit_id = values.unit;
     formData.append('file', file);
-    formData.append('unit_id', unit_id);
+    formData.append('unit', unit_id);
 
     try {
       const res = await dispatch(addVolinteer(formData));
