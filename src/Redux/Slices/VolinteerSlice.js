@@ -27,6 +27,20 @@ export const addVolinteer = createAsyncThunk(
   }
 );
 
+// Update a volunteer
+export const updateVolinteer = createAsyncThunk(
+  'volinteers/updateVolinteer',
+  async ({ id, data }, thunkAPI) => {
+    try {
+      const response = await volinteerAPIs.updateVolunteer(id, data);
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+
 const volineerSlice = createSlice({
   name: 'volinteers',
   initialState: {
@@ -61,6 +75,22 @@ const volineerSlice = createSlice({
         state.volinteers.push(action.payload); 
       })
       .addCase(addVolinteer.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      //   ----------------------------------------
+       .addCase(updateVolinteer.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateVolinteer.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.volinteers.findIndex(v => v.id === action.payload.id);
+        if (index !== -1) {
+          state.volinteers[index] = action.payload;
+        }
+      })
+      .addCase(updateVolinteer.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

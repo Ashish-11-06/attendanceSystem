@@ -132,7 +132,7 @@ const Attendance = () => {
     <div style={{ padding: '16px' }}>
       <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
         <Col>
-          <h2>Mark Attendance</h2>
+          <h1>Mark Attendance</h1>
         </Col>
         <Col>
           <Button type="primary" onClick={showModal}>

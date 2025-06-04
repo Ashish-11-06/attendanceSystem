@@ -1,4 +1,3 @@
-// src/components/Modals/AddUnitModal.jsx
 import React, { useEffect } from 'react';
 import { Modal, Form, Input, Button, message } from 'antd';
 import { addUnit, updateUnit } from '../../Redux/Slices/UnitSlice';
@@ -10,12 +9,20 @@ const AddUnitModal = ({ open, onCancel, form, editingUnit }) => {
 
   useEffect(() => {
     if (editingUnit) {
-      form.setFieldsValue(editingUnit);
+      form.setFieldsValue({
+        ...editingUnit,
+        password: '', // Clear password when editing
+      });
     }
   }, [editingUnit, form]);
 
   const onFinish = async (values) => {
     try {
+      // Don't send password if blank while editing
+      if (isEditing && !values.password) {
+        delete values.password;
+      }
+
       const result = isEditing
         ? await dispatch(updateUnit({ ...editingUnit, ...values }))
         : await dispatch(addUnit(values));

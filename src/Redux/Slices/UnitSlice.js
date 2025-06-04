@@ -30,6 +30,7 @@ export const addUnit = createAsyncThunk(
 export const updateUnit = createAsyncThunk(
   'units/updateUnit',
   async (data, thunkAPI) => {
+    console.log("Data in updateUnit thunk:", data);
     try {
       const response = await unitAPIs.updateUnit(data); // Your API endpoint
       return response.data;

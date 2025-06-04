@@ -27,6 +27,20 @@ export const addEvent = createAsyncThunk(
   }
 );
 
+export const updateEvent = createAsyncThunk(
+  'events/updateEvent',
+  async ({ id, updatedEvent }, thunkAPI) => {
+    try {
+      const response = await eventAPIs.updateEvent(id, updatedEvent);
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+
+
 const eventSlice = createSlice({
   name: 'events',
   initialState: {
@@ -63,7 +77,24 @@ const eventSlice = createSlice({
       .addCase(addEvent.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
+      })
+  //   ----------------------------------------
+ 
+      .addCase(updateEvent.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateEvent.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.events.findIndex((e) => e.id === action.payload.id);
+        if (index !== -1) {
+          state.events[index] = action.payload;
+        }
+      })
+      .addCase(updateEvent.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
   },
 });
 

@@ -6,7 +6,7 @@ const unitAPIs = {
 
   addUnit: (newUnit) => axiosInstance.post("/management/units/", newUnit),
 
-  updateUnit: (unitId, updatedUnit) => axiosInstance.put(`/management/units/${unitId}/`, updatedUnit),
+  updateUnit: (data) => axiosInstance.put(`/management/units/${data.id}/`, data),
 
   deleteUnit: (unitId) => axiosInstance.delete(`/management/units/${unitId}/`),
 

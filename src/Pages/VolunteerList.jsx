@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Table, Input, Row, Col, Button, Spin, message } from 'antd';
 import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import AddVolunteerModal from '../components/Modals/AddVolunteerModal';
-import { fetchAllVolinteer } from '../Redux/Slices/VolinteerSlice';
+import { fetchAllVolinteer, addVolinteer, updateVolinteer } from '../Redux/Slices/VolinteerSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 const VolunteerList = () => {
@@ -12,7 +12,7 @@ const VolunteerList = () => {
   const [searchText, setSearchText] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
-  const [localVolunteers, setLocalVolunteers] = useState([]);
+  const [editingVolunteer, setEditingVolunteer] = useState(null);
 
   useEffect(() => {
     dispatch(fetchAllVolinteer());
@@ -24,19 +24,15 @@ const VolunteerList = () => {
     }
   }, [error]);
 
-  useEffect(() => {
-    setLocalVolunteers(volinteers);
-  }, [volinteers]);
-
-  const filteredData = localVolunteers.filter(({ name, email, volunteer_id, old_personal_number, new_personal_number, phone, gender }) => {
+  const filteredData = volinteers.filter(({ name, email, volunteer_id, old_personal_number, new_personal_number, phone, gender }) => {
     const lowerSearch = searchText.toLowerCase();
     return (
       name.toLowerCase().includes(lowerSearch) ||
       volunteer_id.toLowerCase().includes(lowerSearch) ||
       old_personal_number.toLowerCase().includes(lowerSearch) ||
       new_personal_number.toLowerCase().includes(lowerSearch) ||
-      phone?.toString().toLowerCase().includes(lowerSearch) ||
-      gender.toString().toLowerCase().includes(lowerSearch) ||
+      (phone ? phone.toString().toLowerCase().includes(lowerSearch) : false) ||
+      (gender ? gender.toString().toLowerCase().includes(lowerSearch) : false) ||
       (email && email.toLowerCase().includes(lowerSearch))
     );
   });
@@ -44,7 +40,6 @@ const VolunteerList = () => {
   const columns = [
     {
       title: 'Sr. No.',
-      dataIndex: 'key',
       key: 'srNo',
       render: (_, __, index) => (pagination.current - 1) * pagination.pageSize + index + 1,
     },
@@ -73,37 +68,53 @@ const VolunteerList = () => {
       dataIndex: 'new_personal_number',
       key: 'newPersonalNumber',
     },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (_, record) => (
+        <Button type="link" onClick={() => handleEdit(record)}>
+          Edit
+        </Button>
+      ),
+    },
   ];
 
-  const showModal = () => {
+  const handleAddClick = () => {
+    setEditingVolunteer(null);
+    setIsModalVisible(true);
+  };
+
+  const handleEdit = (volunteer) => {
+    setEditingVolunteer(volunteer);
     setIsModalVisible(true);
   };
 
   const handleCancel = () => {
     setIsModalVisible(false);
+    setEditingVolunteer(null);
   };
 
-  const handleAddVolunteer = (values) => {
-    const newVolunteerId = `V${localVolunteers.length + 1}`;
-    const newVolunteer = {
-      key: (localVolunteers.length + 1).toString(),
-      volunteer_id: newVolunteerId,
-      ...values,
-    };
-    setLocalVolunteers([...localVolunteers, newVolunteer]);
-    setIsModalVisible(false);
-    message.success('Volunteer added successfully!');
+  const handleAddOrUpdate = async (values, volunteerKey) => {
+    try {
+      if (volunteerKey) {
+        // Update existing volunteer
+        await dispatch(updateVolinteer({ id: volunteerKey, data: values }));
+        message.success('Volunteer updated successfully!');
+      } else {
+        // Add new volunteer
+        await dispatch(addVolinteer(values));
+        message.success('Volunteer added successfully!');
+      }
+      setIsModalVisible(false);
+      setEditingVolunteer(null);
+      dispatch(fetchAllVolinteer());
+    } catch (err) {
+      message.error('Error occurred while saving volunteer.');
+    }
   };
 
   return (
-    <div
-      style={{
-        padding: 20,
-        background: '#f4f7fa',
-        minHeight: '100vh',
-        boxSizing: 'border-box',
-      }}
-    >
+    <div style={{ padding: 20, background: '#f4f7fa', minHeight: '100vh', boxSizing: 'border-box' }}>
       <h1 style={{ marginBottom: 20 }}>Volunteer List</h1>
 
       <Row gutter={[16, 16]} justify="space-between" style={{ marginBottom: 16 }}>
@@ -121,7 +132,7 @@ const VolunteerList = () => {
           <Button
             type="primary"
             icon={<PlusOutlined />}
-            onClick={showModal}
+            onClick={handleAddClick}
             block
             style={{
               fontSize: 16,
@@ -139,14 +150,7 @@ const VolunteerList = () => {
       </Row>
 
       <Spin spinning={loading} tip="Loading Volunteers...">
-        <div
-          style={{
-            background: '#fff',
-            padding: 12,
-            borderRadius: 12,
-            overflowX: 'auto',
-          }}
-        >
+        <div style={{ background: '#fff', padding: 12, borderRadius: 12, overflowX: 'auto' }}>
           <Table
             dataSource={filteredData}
             columns={columns}
@@ -156,7 +160,7 @@ const VolunteerList = () => {
               total: filteredData.length,
               showSizeChanger: false,
             }}
-            onChange={(pagination) => setPagination(pagination)}
+            onChange={(page) => setPagination(page)}
             rowKey="key"
             bordered
             scroll={{ x: 'max-content' }}
@@ -165,7 +169,12 @@ const VolunteerList = () => {
         </div>
       </Spin>
 
-      <AddVolunteerModal visible={isModalVisible} onCancel={handleCancel} onAdd={handleAddVolunteer} />
+      <AddVolunteerModal
+        visible={isModalVisible}
+        onCancel={handleCancel}
+        onFinish={handleAddOrUpdate}
+        volunteer={editingVolunteer}
+      />
     </div>
   );
 };

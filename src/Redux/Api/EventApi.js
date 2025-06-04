@@ -6,6 +6,10 @@ const eventAPIs = {
 
   addEvent: (newEvent) => axiosInstance.post("/management/events/", newEvent),
 
+  updateEvent: (id, updatedEvent) => axiosInstance.put(`/management/events/${id}/`, updatedEvent),
+
+
+
 //   // Edit a specific book by ID
 //   editBook: (id, bookData) => axiosInstance.put(`/books/${id}/`, bookData),
 

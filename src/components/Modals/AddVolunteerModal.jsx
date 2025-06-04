@@ -1,21 +1,35 @@
-import React from 'react';
-import { Modal, Form, Input, Select, Row, Col, Button } from 'antd';
+import React, { useEffect } from 'react';
+import { Modal, Form, Input, Select, Button, message } from 'antd';
 
 const { Option } = Select;
 
-const AddVolunteerModal = ({ visible, onCancel, onAdd }) => {
+const AddVolunteerModal = ({ visible, onCancel, onFinish, volunteer }) => {
   const [form] = Form.useForm();
 
-  const handleFinish = (values) => {
-    onAdd({
-      name: values.name,
-      gender: values.gender,
-      phone: values.phone || '',
-      email: values.email || '',
-      old_personal_number: values.oldPersonalNumber,
-      new_personal_number: values.newPersonalNumber,
-    });
-    form.resetFields();
+  useEffect(() => {
+    if (volunteer) {
+      // Prefill form fields when editing
+      form.setFieldsValue({
+        name: volunteer.name,
+        gender: volunteer.gender,
+        phone: volunteer.phone,
+        email: volunteer.email,
+        oldPersonalNumber: volunteer.old_personal_number,
+        newPersonalNumber: volunteer.new_personal_number,
+      });
+    } else {
+      form.resetFields();
+    }
+  }, [volunteer, form]);
+
+  const handleSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+      onFinish(values, volunteer ? volunteer.key : null);
+      form.resetFields();
+    } catch (error) {
+      message.error('Please fix the errors before submitting.');
+    }
   };
 
   const handleCancel = () => {
@@ -25,22 +39,29 @@ const AddVolunteerModal = ({ visible, onCancel, onAdd }) => {
 
   return (
     <Modal
-      title="Add New Volunteer"
-      open={visible}
+      title={volunteer ? 'Edit Volunteer' : 'Add New Volunteer'}
+      visible={visible}
       onCancel={handleCancel}
-      footer={null}
       destroyOnClose
       centered
-      styles={{ body: { padding: '24px 24px 12px' } }}
-      width="90%"
-      style={{ maxWidth: 600 }}
+      width={600}
+      footer={
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '16px',
+            paddingBottom: '12px',
+          }}
+        >
+          <Button onClick={handleCancel}>Cancel</Button>
+          <Button type="primary" onClick={handleSubmit}>
+            {volunteer ? 'Update' : 'Add'}
+          </Button>
+        </div>
+      }
     >
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleFinish}
-        initialValues={{ gender: 'Male' }}
-      >
+      <Form form={form} layout="vertical">
         <Form.Item
           label="Name"
           name="name"
@@ -117,19 +138,6 @@ const AddVolunteerModal = ({ visible, onCancel, onAdd }) => {
           ]}
         >
           <Input placeholder="Enter new personal number (6-12 chars)" />
-        </Form.Item>
-
-        <Form.Item>
-          <Row justify="center" gutter={16}>
-            <Col>
-              <Button onClick={handleCancel}>Cancel</Button>
-            </Col>
-            <Col>
-              <Button type="primary" htmlType="submit">
-                Add Volunteer
-              </Button>
-            </Col>
-          </Row>
         </Form.Item>
       </Form>
     </Modal>
