@@ -19,7 +19,7 @@ export const addVolinteer = createAsyncThunk(
   'volinteers/addvolinteer',
   async (newVolinteer, thunkAPI) => {
     try {
-      const response = await volinteerAPIs.addEvent(newVolinteer);
+      const response = await volinteerAPIs.addVolunteer(newVolinteer);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data || error.message);
@@ -72,7 +72,7 @@ const volineerSlice = createSlice({
       })
       .addCase(addVolinteer.fulfilled, (state, action) => {
         state.loading = false;
-        state.volinteers.push(action.payload); 
+        // state.volinteers.push(action.payload); 
       })
       .addCase(addVolinteer.rejected, (state, action) => {
         state.loading = false;
