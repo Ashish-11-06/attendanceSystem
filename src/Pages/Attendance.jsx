@@ -19,6 +19,7 @@ import { fetchAllUnits } from '../Redux/Slices/UnitSlice';
 import {
   fetchAttendance,
   clearAttendance,
+  addAttendance,
 } from '../Redux/Slices/AttendanceSlice';
 import AttendanceUploadModal from '../components/Modals/AttendanceUploadModal';
 import { getVolunteerByUnitId } from '../Redux/Slices/VolinteerSlice';
@@ -104,9 +105,6 @@ const handleInTimeChange = (time, timeString, recordKey) => {
   );
 };
 
-  const handleSubmitAttendance = () => {
-    alert('Attendance submitted!');
-  };
 
   const showModal = () => setIsModalOpen(true);
   const handleCancel = () => {
@@ -202,6 +200,36 @@ const handleInTimeChange = (time, timeString, recordKey) => {
       ),
     },
   ];
+
+  const handleSubmitAttendance = () => {
+  form.validateFields().then((values) => {
+    const { event, unit } = values;
+    const date = new Date().toISOString().split('T')[0]; // e.g. '2025-06-04'
+
+    const payload = localVolunteers.map((vol) => ({
+      volunteer: vol.id || vol.volunteer || vol.key, // ensure correct ID
+      event,
+      unit,
+      date,
+      in_time: vol.in_time || null,
+      out_time: vol.out_time || null, // if you want to support it
+      present: vol.present || false,
+      absent: !vol.present,
+      remark: vol.remark || '',
+    }));
+
+    dispatch(addAttendance(payload))
+      .unwrap()
+      .then(() => {
+        alert('Attendance successfully submitted!');
+      })
+      .catch((error) => {
+        console.error('Failed to submit attendance:', error);
+        alert('Error submitting attendance.');
+      });
+  });
+};
+
 
   return (
     <div style={{ padding: '16px' }}>

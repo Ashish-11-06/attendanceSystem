@@ -71,10 +71,10 @@ useEffect(() => {
   const columns = [
     { title: 'ATD_ID', dataIndex: 'atd_id', key: 'atdId' },
      {
-  title: 'Volunteer ID',
+  title: 'New P no',
   dataIndex: 'volunteer',
-  key: 'volunteerId',
-  render: (volunteer) => volunteer?.volunteer_id ?? 'N/A',
+  key: 'new_personal_number',
+  render: (volunteer) => volunteer?.new_personal_number	 ?? 'N/A',
 },
  
     {

@@ -14,6 +14,19 @@ export const fetchAttendance = createAsyncThunk(
   }
 );
 
+export const addAttendance = createAsyncThunk(
+  'attendance/addAttendance',
+  async (values, { rejectWithValue }) => {
+    try {
+      const response = await attendanceAPIs.addAttendance(values);
+      return response.data;
+    } catch (error) {
+      console.error(error.response?.data);
+      return rejectWithValue(error.response?.data || 'Error fetching attendance');
+    }
+  }
+);
+
 const attendanceSlice = createSlice({
   name: 'attendance',
   initialState: {
