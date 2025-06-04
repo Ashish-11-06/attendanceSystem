@@ -18,7 +18,7 @@ import { fetchAllEvents } from '../Redux/Slices/EventSlice';
 import { fetchAllUnits } from '../Redux/Slices/UnitSlice';
 import {
   fetchAttendance,
-  clearAttendance,
+  addAttendanceFile,
   addAttendance,
 } from '../Redux/Slices/AttendanceSlice';
 import AttendanceUploadModal from '../components/Modals/AttendanceUploadModal';

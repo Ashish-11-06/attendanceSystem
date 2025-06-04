@@ -8,7 +8,7 @@ const volinteerAPIs = {
 
   addVolunteer: (formData) => {
     // formData should contain both 'file' and 'unit_id'
-    const unit_id = formData.get('unit_id');
+    const unit_id = formData.get('unit');
     return axiosInstance.post(
       `/management/volinteers/upload-file/${unit_id}/`,
       formData,

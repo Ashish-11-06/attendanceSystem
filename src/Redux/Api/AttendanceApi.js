@@ -9,7 +9,7 @@ const attendanceAPIs = {
 
 addAttendanceFile: (formData) => {
   return axiosInstance.post(
-    `/management/attendance/attendance-files/`,
+    `/management/attendance-files/`,
     formData,
     {
       headers: {
