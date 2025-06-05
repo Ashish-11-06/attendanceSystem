@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Layout, Menu, Breadcrumb, Avatar, Drawer } from 'antd';
 import {
   MenuFoldOutlined,
@@ -22,8 +22,16 @@ const AppLayout = ({ children }) => {
   const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  useEffect(() => {
+  const user = JSON.parse(localStorage.getItem('user'));
+  if (!user) {
+    navigate('/login');
+  }
+}, []);
+
+
     const user = JSON.parse(localStorage.getItem('user'));
-  const username = user?.user_type === 'admin' ? user.admin_name : user.unit_name || 'user';
+  const username = user?.user_type === 'admin' ? user?.admin_name : user?.unit_name || 'user';
   const menuItems = [
     { key: '/', icon: <DashboardOutlined />, label: 'Dashboard' },
     { key: '/events-list', icon: <CalendarOutlined />, label: 'Event List' },

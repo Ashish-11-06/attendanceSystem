@@ -54,9 +54,6 @@ function AuthGuard({ children }) {
 }
 
 function App() {
-  const user = JSON.parse(localStorage.getItem('user'));
-  console.log('user',user);
-  
   return (
     <Router>
       <AuthGuard>
@@ -87,3 +84,4 @@ function App() {
 }
 
 export default App;
+
