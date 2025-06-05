@@ -344,7 +344,7 @@ formData.append('file_name', fileName);
           {attendanceError && (
             // Only show error if it's not HTML (e.g., not starting with '<')
             !/^</.test(attendanceError) && (
-              <Alert message={attendanceError} type="error" style={{ marginBottom: 16 }} />
+              <Alert message={attendanceError.message} type="error" style={{ marginBottom: 16 }} />
             )
           )}
 
