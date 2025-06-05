@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Table, Input, Row, Col, Button, Form, Spin, Alert } from 'antd';
+import { Table, Input, Row, Col, Button, Form, Spin, Alert, message } from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import AddLocationModal from '../components/Modals/AddLocationModal';
 import { addLocation, fetchAllLocations } from '../Redux/Slices/locationSlice';
@@ -71,6 +71,7 @@ const LocationList = () => {
       form.resetFields();
       setSelectedStateId(null);
       setIsModalVisible(false);
+      message.success("Location added successfully!");
       dispatch(fetchAllLocations());
     } catch (err) {
       console.error('Failed to add location:', err);

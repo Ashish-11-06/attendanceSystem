@@ -1,50 +1,35 @@
-// src/components/Modals/AddEventModal.jsx
 import React, { useEffect, useState } from 'react';
 import { Modal, Form, Input, Select, DatePicker, TimePicker, Button, message, Spin } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { addEvent, updateEvent, fetchAllEvents } from '../../Redux/Slices/EventSlice';
 import { fetchAllLocations } from '../../Redux/Slices/locationSlice';
+
 import dayjs from 'dayjs';
+import { fetchAllUnits } from '../../Redux/Slices/UnitSlice';
 
 const { Option } = Select;
 
 const AddEventModal = ({ visible, onCancel, form, editingEvent }) => {
   const dispatch = useDispatch();
   const { locations, loading } = useSelector((state) => state.locations);
+  const { units } = useSelector((state) => state.units); // Fetch units from the store
 
-  // Track selected locations for dynamic unit fields
   const [selectedLocations, setSelectedLocations] = useState([]);
-  // Store units per location id
   const [unitsByLocation, setUnitsByLocation] = useState({});
 
-  // Mock API call for units by locationId
-  const fetchUnitsForLocation = async (locationId) => {
-    // Replace this with your actual API call
-    // Example: return await dispatch(fetchUnits(locationId));
-    // Mock data:
-    const mockUnits = {
-      1: [
-        { id: 'U1', name: 'Unit 1A' },
-        { id: 'U2', name: 'Unit 1B' }
-      ],
-      2: [
-        { id: 'U3', name: 'Unit 2A' },
-        { id: 'U4', name: 'Unit 2B' }
-      ],
-      3: [
-        { id: 'U5', name: 'Unit 3A' }
-      ]
-    };
-    return mockUnits[locationId] || [];
-  };
+  // Fetch all units when the component mounts
+  useEffect(() => {
+    dispatch(fetchAllUnits());
+  }, [dispatch]);
 
   // Fetch units when selectedLocations changes
   useEffect(() => {
-    const fetchAllUnits = async () => {
+    const fetchAllUnitsForLocations = () => {
       const newUnitsByLocation = { ...unitsByLocation };
       for (const locId of selectedLocations) {
         if (!newUnitsByLocation[locId]) {
-          newUnitsByLocation[locId] = await fetchUnitsForLocation(locId);
+          // Filter units for the selected location
+          newUnitsByLocation[locId] = units.filter(unit => !Object.values(newUnitsByLocation).flat().includes(unit.id));
         }
       }
       // Remove units for unselected locations
@@ -53,17 +38,16 @@ const AddEventModal = ({ visible, onCancel, form, editingEvent }) => {
           delete newUnitsByLocation[locId];
         }
       });
-      setUnitsByLocation({ ...newUnitsByLocation });
+      setUnitsByLocation(newUnitsByLocation);
     };
+
     if (selectedLocations.length > 0) {
-      fetchAllUnits();
+      fetchAllUnitsForLocations();
     } else {
       setUnitsByLocation({});
     }
-    // eslint-disable-next-line
-  }, [selectedLocations]);
+  }, [selectedLocations, units]);
 
-  // Ensure locations is always an array
   const safeLocations = Array.isArray(locations) ? locations : [];
 
   useEffect(() => {
@@ -102,7 +86,6 @@ const AddEventModal = ({ visible, onCancel, form, editingEvent }) => {
     }
   }, [visible, editingEvent, form]);
 
-  // Handle location selection change to update unit fields
   const handleLocationChange = (value) => {
     const stringValues = value.map(String);
     setSelectedLocations(stringValues);
@@ -114,14 +97,25 @@ const AddEventModal = ({ visible, onCancel, form, editingEvent }) => {
   };
 
   const onFinish = async (values) => {
+    // Transform values.location and values.units to the requested format
+    const locationsArray = (values.location || []).map((locId) => {
+      const unitStrings = (values.units && values.units[locId]) || [];
+      // Filter out 'none' or any invalid values
+      const unitIds = unitStrings.filter(u => u !== 'none').map(u => parseInt(u, 10));
+      return {
+        location_id: parseInt(locId, 10),
+        unit: unitIds,
+      };
+    });
+
     const eventData = {
       event_name: values.eventName,
-      location: values.location,
+      locations: locationsArray,
       start_date: values.start_date.format('YYYY-MM-DD'),
       end_date: values.end_date.format('YYYY-MM-DD'),
       time: values.time.format('HH:mm:ss'),
-      units: values.units, // { locationId: [unitIds] }
     };
+
     console.log('eventData', eventData);
 
     try {
@@ -199,7 +193,7 @@ const AddEventModal = ({ visible, onCancel, form, editingEvent }) => {
         {/* Unit fields for each selected location */}
         {selectedLocations.length > 0 && selectedLocations.map((locId) => {
           const locationObj = safeLocations.find((l) => String(l.id) === String(locId));
-          const units = unitsByLocation[locId] || [];
+          const unitsForLocation = unitsByLocation[locId] || [];
           if (!locationObj) return null;
           return (
             <Form.Item
@@ -209,13 +203,13 @@ const AddEventModal = ({ visible, onCancel, form, editingEvent }) => {
             >
               <Select
                 mode="multiple"
-                placeholder={units.length === 0 ? "No units found" : "Select unit(s)"}
+                placeholder={unitsForLocation.length === 0 ? "No units found" : "Select unit(s)"}
                 optionFilterProp="children"
-                disabled={units.length === 0}
+                disabled={unitsForLocation.length === 0}
                 allowClear
               >
                 <Option key="none" value="none">None</Option>
-                {units.map((unit) => (
+                {unitsForLocation.map((unit) => (
                   <Option key={unit.id} value={String(unit.id)}>
                     {unit.name}
                   </Option>
@@ -275,3 +269,4 @@ const AddEventModal = ({ visible, onCancel, form, editingEvent }) => {
 };
 
 export default AddEventModal;
+
