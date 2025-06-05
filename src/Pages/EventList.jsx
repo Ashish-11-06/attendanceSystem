@@ -8,6 +8,7 @@ import {
   Spin,
   message,
   Form,
+  Divider,
 } from 'antd';
 import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
@@ -79,23 +80,37 @@ const EventList = () => {
       dataIndex: 'event_name',
       key: 'eventName',
     },
-    {
-      title: 'Location',
-      dataIndex: 'locations', // <-- changed from 'location' to 'locations'
-      key: 'location',
-      render: (locations) => {
-        if (!Array.isArray(locations) || locations.length === 0) return 'N/A';
-        return (
-          <div>
-            {locations.map((loc, index) => (
-              <div key={index}>
-                {loc.address}, {loc.city}, {loc.state}
-              </div>
-            ))}
+{
+  title: 'Location',
+  dataIndex: 'locations',
+  key: 'location',
+  render: (locations) => {
+    if (!Array.isArray(locations) || locations.length === 0) return 'N/A';
+
+    return (
+      <div>
+        {locations.map((loc, index) => (
+          <div key={index} style={{ marginBottom: '8px' }}>
+            <div>
+              <strong>{loc.location_address}, {loc.location_city}</strong>
+            </div>
+            {Array.isArray(loc.units) && loc.units.length > 0 ? (
+              <ul style={{ marginLeft: 16 }}>
+                {loc.units.map((unit, idx) => (
+                  <li key={idx}>{unit.unit_name}</li>
+                ))}
+              </ul>
+            ) : (
+              <div style={{ marginLeft: 16 }}>No units available</div>
+            )}
+            {index !== locations.length - 1 && <Divider style={{ margin: '8px 0' }} />}
           </div>
-        );
-      },
-    },
+        ))}
+      </div>
+    );
+  },
+},
+
     {
       title: 'Start Date',
       dataIndex: 'start_date',
