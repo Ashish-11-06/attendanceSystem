@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useRef  } from 'react';
 import { Table, Tag, Button, Select, Spin, message } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,6 +7,8 @@ import { fetchAllUnits } from '../Redux/Slices/UnitSlice';
 import { fetchAllVolinteer } from '../Redux/Slices/VolinteerSlice';
 import { fetchAttendance } from '../Redux/Slices/AttendanceSlice';
 import { title } from 'framer-motion/client';
+import Download from './Download';
+
 
 const Attendance_list = () => {
   const dispatch = useDispatch();
@@ -19,6 +21,11 @@ const Attendance_list = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
+  const downloadRef = useRef();
+
+  const handlePrint = () => {
+  downloadRef.current?.print();
+  };
 
   // Fetch events and units on mount
   useEffect(() => {
@@ -157,16 +164,29 @@ useEffect(() => {
         }}
       >
         <h1 style={{ margin: 0, fontSize: '1.8rem' }}>Attendance List</h1>
-        <Button
-          type="primary"
-          icon={<DownloadOutlined />}
-          onClick={handleDownload}
-          style={{ minWidth: 120 }}
-          disabled={tableData?.length === 0}
+        
+        <div
+          style={{
+            display: 'flex',
+            gap: 12,
+          }}
         >
-          Download
-        </Button>
+
+                  <Button
+            type="primary"
+            icon={<DownloadOutlined />}
+            onClick={handleDownload}
+            style={{ minWidth: 120 }}
+            disabled={tableData.length === 0}
+          >
+            Download Attendance
+          </Button>
+
+          <Button onClick={handlePrint}>Download Report</Button>
+        </div>
       </div>
+
+      <Download ref={downloadRef} />
 
       <div
         style={{
@@ -178,6 +198,7 @@ useEffect(() => {
           justifyContent: 'flex-start',
         }}
       >
+
         {/* Event Select */}
         <div style={{ flex: '1 1 250px', minWidth: 200 }}>
           <label
