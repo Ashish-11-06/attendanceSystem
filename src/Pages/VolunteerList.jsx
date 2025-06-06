@@ -118,14 +118,14 @@ const VolunteerList = () => {
       <h1 style={{ marginBottom: 20 }}>Volunteer List</h1>
 
       <Row gutter={[16, 16]} justify="space-between" style={{ marginBottom: 16 }}>
-        <Col xs={24} sm={18}>
+        <Col xs={24} sm={18} md={16} lg={12} xl={10}>
           <Input
             placeholder="Search by name, phone, or email"
             allowClear
             prefix={<SearchOutlined style={{ color: '#999' }} />}
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
-            style={{ width: '55%' }}
+            style={{ width: '100%', borderRadius: 8 }}
           />
         </Col>
         <Col xs={24} sm={6}>

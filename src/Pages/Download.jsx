@@ -28,15 +28,36 @@ const Download = forwardRef((props, ref) => {
   }));
 
   return (
-    // Offscreen positioning so html2canvas can render correctly
     <div style={{ position: "absolute", left: "-9999px", top: 0 }}>
-      <div ref={printRef} id="print-content">
-        <h2 style={{ textAlign: "center" }}>Attendance Report</h2>
+      <div
+        ref={printRef}
+        id="print-content"
+        style={{
+          padding: "24px",
+          backgroundColor: "white",
+          fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+          fontSize: "12px",
+          color: "#222",
+          width: "900px",
+        }}
+      >
+        <h2
+          style={{
+            textAlign: "center",
+            marginBottom: "20px",
+            fontWeight: "700",
+            fontSize: "20px",
+          }}
+        >
+          Attendance Report
+        </h2>
         <table
           style={{
             width: "100%",
             borderCollapse: "collapse",
             textAlign: "center",
+            boxShadow:
+              "0 0 5px rgba(0, 0, 0, 0.15)", // subtle shadow for better table visibility
           }}
         >
           <thead>
@@ -93,13 +114,17 @@ const Download = forwardRef((props, ref) => {
 const styles = {
   th: {
     border: "1px solid black",
-    padding: "6px",
+    padding: "10px 12px",
     fontWeight: "bold",
+    backgroundColor: "#f0f0f0",
+    color: "#333",
+    fontSize: "13px",
   },
   td: {
     border: "1px solid black",
-    padding: "6px",
+    padding: "8px 12px",
+    fontSize: "12px",
   },
 };
 
-export default Download;
+export default Download;

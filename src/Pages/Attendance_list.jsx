@@ -57,23 +57,38 @@ useEffect(() => {
   console.log(attendance);
 
   // Prepare table data only if both selected
-  const tableData =
-    selectedEvent && selectedUnit
-      ? attendance?.map((v, index) => ({
-          key: v.id || index,
-          atdId: v.atdId || `ATD${index + 1}`,
-          volunteerId: v.volunteer_id || v.id,
-          // event: v.event || '-',
-          unitId: v.unit_id || (v.unit && v.unit.unit_id) || '-',
-          date: v.date || '-',
-          inTime: v.inTime || '-',
-          outTime: v.outTime || '-',
-          present: typeof v.present === 'boolean' ? v.present : false,
-          remark: v.remark || '-',
-        }))
-      : [];
+  // const tableData =
+  //   selectedEvent && selectedUnit
+  //     ? attendance?.map((v, index) => ({
+  //         key: v.id || index,
+  //         atdId: v.atdId || `ATD${index + 1}`,
+  //         volunteerId: v.volunteer_id || v.id,
+  //         // event: v.event || '-',
+  //         unitId: v.unit_id || (v.unit && v.unit.unit_id) || '-',
+  //         date: v.date || '-',
+  //         inTime: v.inTime || '-',
+  //         outTime: v.outTime || '-',
+  //         present: typeof v.present === 'boolean' ? v.present : false,
+  //         remark: v.remark || '-',
+  //       }))
+  //     : [];
 
-      console.log(tableData);
+  //     console.log(tableData);
+
+const tableData = (attendance || []).map((v, index) => ({
+  key: v.id || index,
+  atdId: v.atd_id || `ATD${index + 1}`,
+  volunteerId: v.volunteer?.new_personal_number || 'N/A',
+  eventId: v.event?.event_id || 'N/A',
+  unitId: v.volunteer?.unit?.unit_id || 'N/A',
+  date: v.date ? new Date(v.date).toISOString().split('T')[0] : 'N/A', // YYYY-MM-DD
+  inTime: v.in_time || 'N/A',
+  outTime: v.out_time || 'N/A',
+  present: typeof v.present === 'boolean' ? v.present : false,
+  remark: v.remark || '-',
+}));
+
+
 
   const columns = [
     { title: 'ATD_ID', dataIndex: 'atd_id', key: 'atdId' },

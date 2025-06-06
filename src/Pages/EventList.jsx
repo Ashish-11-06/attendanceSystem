@@ -182,7 +182,7 @@ const EventList = () => {
       value={searchText}
       onChange={(e) => setSearchText(e.target.value)}
       prefix={<SearchOutlined style={{ color: '#999' }} />}
-      style={{ width: 250 }}
+      style={{ width: 325 }}
     />
     <DatePicker
       placeholder="Filter by date"
