@@ -6,6 +6,7 @@ import volinteerReducer from './Slices/VolinteerSlice';
 import attendanceReducer from './Slices/AttendanceSlice';
 import dashboardReducer from './Slices/dashboardSlice';
 import profileReducer from './Slices/ProfileSlice';
+import volunteerReportReducer from "./Slices/volunteerReportSlice";
 
 export const store = configureStore({
   reducer: {
@@ -15,6 +16,7 @@ export const store = configureStore({
     volinteers: volinteerReducer,
     dashboard: dashboardReducer,
     attendance: attendanceReducer,
-     profile: profileReducer,
+    profile: profileReducer,
+    volunteerReport: volunteerReportReducer,
   },
 });

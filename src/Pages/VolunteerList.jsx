@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useRef} from 'react';
 import { Table, Input, Row, Col, Button, Spin, message, Tag } from 'antd';
 import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import AddVolunteerModal from '../components/Modals/AddVolunteerModal';
 import { fetchAllVolinteer, addVolinteer, updateVolinteer } from '../Redux/Slices/VolinteerSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import Volunteer_report from './Volunteer_report';
 
 const VolunteerList = () => {
   const dispatch = useDispatch();
@@ -23,6 +24,12 @@ const VolunteerList = () => {
       message.error(`Failed to load volunteers: ${error}`);
     }
   }, [error]);
+
+  const downloadRef = useRef();
+
+  const handlePrint = () => {
+  downloadRef.current?.print();
+  };
 
   const filteredData = volinteers.filter(({ name, email, volunteer_id, old_personal_number, new_personal_number, phone, gender }) => {
     const lowerSearch = searchText.toLowerCase();
@@ -177,27 +184,41 @@ const VolunteerList = () => {
             style={{ width: '100%', borderRadius: 8 }}
           />
         </Col>
-        <Col xs={24} sm={6}>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={handleAddClick}
-            block
-            style={{
-              fontSize: 16,
-              padding: '10px 30px',
-              background: '#3f87f5',
-              borderColor: '#3f87f5',
-              borderRadius: 6,
-              boxShadow: '0 3px 10px rgba(63, 135, 245, 0.3)',
-              width: '50%',
-            }}
-          >
-            Add Volunteer
-          </Button>
-        </Col>
-      </Row>
+            <Col xs={24} sm={12} md={12} lg={14} xl={12} style={{ textAlign: 'right' }}>
+    <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+      <Button
+        type="primary"
+        icon={<PlusOutlined />}
+        onClick={handleAddClick}
+        style={{
+          fontSize: 16,
+          padding: '10px 20px',
+          background: '#3f87f5',
+          borderColor: '#3f87f5',
+          borderRadius: 6,
+          boxShadow: '0 3px 10px rgba(63, 135, 245, 0.3)',
+        }}
+      >
+        Add Volunteer
+      </Button>
 
+      <Button
+        onClick={handlePrint}
+        style={{
+          fontSize: 16,
+          padding: '10px 20px',
+          borderRadius: 6,
+        }}
+      >
+        Download Report
+      </Button>
+    </div>
+
+    {/* Hidden printable component */}
+    <Volunteer_report ref={downloadRef} />
+  </Col>
+      </Row>
+          
       <Spin spinning={loading} tip="Loading Volunteers...">
         <div style={{ background: '#fff', padding: 12, borderRadius: 12, overflowX: 'auto' }}>
           <Table

@@ -232,7 +232,7 @@ const handleOk = async () => {
               width: '100%',
             }}
           >
-            <Button
+            {/* <Button
               type="primary"
               icon={<EditOutlined />}
               onClick={showModal}
@@ -249,7 +249,7 @@ const handleOk = async () => {
               }}
             >
               Edit
-            </Button>
+            </Button> */}
 
             <Button
               icon={<LogoutOutlined />}
