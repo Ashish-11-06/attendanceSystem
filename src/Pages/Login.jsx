@@ -97,9 +97,13 @@ const Login = () => {
       message.success("Login successful!");
       console.log("Response:", data);
 
+    if (!data.user.id) {
+      data.user.id = data.user._id || ""; // fallback if _id exists or empty string
+    }
+
           // Store the email, password, and user_type in localStorage
 localStorage.setItem("user", JSON.stringify(data.user));
-
+ 
 
       
       // localStorage.setItem("token", data.token); // adjust based on your API
