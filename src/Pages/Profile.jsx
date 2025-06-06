@@ -131,7 +131,7 @@ const handleOk = async () => {
   return (
     <div
       style={{
-        background: 'linear-gradient(to right, #f0f2f5, #e6f7ff)',
+        // background: 'linear-gradient(to right, #f0f2f5, #e6f7ff)',
         minHeight: '100vh',
         padding: '30px 20px',
         display: 'flex',

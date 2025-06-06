@@ -57,7 +57,7 @@ const Download = forwardRef((props, ref) => {
             borderCollapse: "collapse",
             textAlign: "center",
             boxShadow:
-              "0 0 5px rgba(0, 0, 0, 0.15)", // subtle shadow for better table visibility
+              "0 0 5px rgba(0, 0, 0, 0.15)", 
           }}
         >
           <thead>
