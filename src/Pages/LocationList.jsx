@@ -117,7 +117,8 @@ const LocationList = () => {
       </Row>
 
       {error && (
-        <Alert message="Error" description={error} type="error" showIcon style={{ marginBottom: 20 }} />
+        // <Alert message="Error" description={error} type="error" showIcon style={{ marginBottom: 20 }} />
+        message.error(error, 5)
       )}
 
       <div

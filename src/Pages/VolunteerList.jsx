@@ -54,7 +54,7 @@ const VolunteerList = () => {
         return (
           <div>
          
-           {unit.unit_name} || N/A
+           {unit.unit_name || 'N/A'} 
                    
                 
           </div>
