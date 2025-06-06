@@ -50,14 +50,21 @@ const EventList = () => {
     pageSize: 10,
   });
 
-  const filteredData = (Array.isArray(events) ? events : []).filter(({ event_name, location, start_date, end_date }) => {
+  const filteredData = (Array.isArray(events) ? events : []).filter(({ event_name, locations, start_date, end_date }) => {
     const matchesText =
       event_name.toLowerCase().includes(searchText.toLowerCase()) ||
-      location.some(
+      locations.some(
         (loc) =>
-          loc.city?.toLowerCase().includes(searchText.toLowerCase()) ||
-          loc.address?.toLowerCase().includes(searchText.toLowerCase()) ||
-          loc.state?.toLowerCase().includes(searchText.toLowerCase())
+          loc.location_city?.toLowerCase().includes(searchText.toLowerCase()) ||
+          loc.location_address?.toLowerCase().includes(searchText.toLowerCase()) ||
+          loc.location_state?.toLowerCase().includes(searchText.toLowerCase())
+      )||
+      locations.some(
+        (loc) =>
+          loc.units?.some(
+            (unit) =>
+              unit.unit_name?.toLowerCase().includes(searchText.toLowerCase())
+          )
       );
 
     const matchesDate = selectedDate

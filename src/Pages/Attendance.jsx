@@ -152,7 +152,7 @@ formData.append('file_name', fileName);
 
 
   // Apply filter based on dropdown selection
-  const filteredVolunteers = volinteers?.filter((vol) => {
+  const filteredVolunteers = localVolunteers?.filter((vol) => {
     if (!filterOption) return true;
     if (filterOption === 'male' || filterOption === 'female') {
       return vol.gender?.toLowerCase() === filterOption;
@@ -351,7 +351,7 @@ formData.append('file_name', fileName);
           <Row style={{ overflowX: 'auto' }}>
             <Col span={24}>
               <Table
-                dataSource={localVolunteers}
+                dataSource={filteredVolunteers}
                 columns={columns}
                 pagination={false}
                 rowKey={(record) => record.key || record.atdId || record.id || Math.random()}

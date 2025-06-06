@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Input, Row, Col, Button, Spin, message } from 'antd';
+import { Table, Input, Row, Col, Button, Spin, message, Tag } from 'antd';
 import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import AddVolunteerModal from '../components/Modals/AddVolunteerModal';
 import { fetchAllVolinteer, addVolinteer, updateVolinteer } from '../Redux/Slices/VolinteerSlice';
@@ -43,21 +43,25 @@ const VolunteerList = () => {
       key: 'srNo',
       render: (_, __, index) => (pagination.current - 1) * pagination.pageSize + index + 1,
     },
-    { title: 'Volunteer ID', dataIndex: 'volunteer_id', key: 'volunteer_id' },
-    { title: 'Name', dataIndex: 'name', key: 'name' },
-    { title: 'Gender', dataIndex: 'gender', key: 'gender' },
+    // { title: 'Volunteer ID', dataIndex: 'volunteer_id', key: 'volunteer_id' },
     {
-      title: 'Phone Number',
-      dataIndex: 'phone',
-      key: 'phone',
-      render: (text) => text || '-',
+      title: 'Unit Name',
+      dataIndex: 'unit',
+      key: 'unit',
+      render: (unit) => {
+        // if (!Array.isArray(unit) || unit.length === 0) return 'N/A';
+    
+        return (
+          <div>
+         
+           {unit.unit_name} || N/A
+                   
+                
+          </div>
+        );
+      },
     },
-    {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
-      render: (text) => text || '-',
-    },
+  
     {
       title: 'Old P. No.',
       dataIndex: 'old_personal_number',
@@ -68,6 +72,51 @@ const VolunteerList = () => {
       dataIndex: 'new_personal_number',
       key: 'newPersonalNumber',
     },
+    { title: 'Name', dataIndex: 'name', key: 'name' },
+    {
+  title: 'Gender',
+  dataIndex: 'gender',
+  key: 'gender',
+  render: (value) => {
+    let color = 'default';
+    let label = value;
+
+    switch (value?.toLowerCase()) {
+      case 'male':
+        color = 'blue';
+        label = 'Male';
+        break;
+      case 'female':
+        color = 'pink';
+        label = 'Female';
+        break;
+      case 'other':
+        color = 'purple';
+        label = 'Other';
+        break;
+      default:
+        label = 'Unknown';
+    }
+
+    return <Tag color={color}>{label}</Tag>;
+  }
+}
+,
+     {
+      title: 'Is Reg?',
+      dataIndex: 'is_registered',
+      key: 'is_registered',
+      render: (value) => 
+       <Tag color={value ? 'green' : 'orange'}>{value ? 'Reg' : 'Not Reg'}</Tag>
+      // ellipsis: true,
+    },
+    {
+      title: 'Phone Number',
+      dataIndex: 'phone',
+      key: 'phone',
+      render: (text) => text || '-',
+    },
+    
     {
       title: 'Action',
       key: 'action',
