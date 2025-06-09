@@ -184,39 +184,40 @@ const VolunteerList = () => {
             style={{ width: '100%', borderRadius: 8 }}
           />
         </Col>
-            <Col xs={24} sm={12} md={12} lg={14} xl={12} style={{ textAlign: 'right' }}>
-    <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-      <Button
-        type="primary"
-        icon={<PlusOutlined />}
-        onClick={handleAddClick}
-        style={{
-          fontSize: 16,
-          padding: '10px 20px',
-          background: '#3f87f5',
-          borderColor: '#3f87f5',
-          borderRadius: 6,
-          boxShadow: '0 3px 10px rgba(63, 135, 245, 0.3)',
-        }}
-      >
-        Add Volunteer
-      </Button>
-
-      <Button
-        onClick={handlePrint}
-        style={{
-          fontSize: 16,
-          padding: '10px 20px',
-          borderRadius: 6,
-        }}
-      >
-        Download Report
-      </Button>
-    </div>
-
-    {/* Hidden printable component */}
-    <Volunteer_report ref={downloadRef} />
-  </Col>
+  <Col xs={24} sm={24} md={24} lg={12} xl={12}>
+          <Row justify="start" justify-md="end" gutter={[12, 12]}>
+            <Col>
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={handleAddClick}
+                style={{
+                  fontSize: 16,
+                  padding: '10px 20px',
+                  background: '#3f87f5',
+                  borderColor: '#3f87f5',
+                  borderRadius: 6,
+                  boxShadow: '0 3px 10px rgba(63, 135, 245, 0.3)',
+                }}
+              >
+                Add Volunteer
+              </Button>
+            </Col>
+            <Col>
+              <Button
+                onClick={handlePrint}
+                style={{
+                  fontSize: 16,
+                  padding: '10px 20px',
+                  borderRadius: 6,
+                }}
+              >
+                Download Report
+              </Button>
+            </Col>
+          </Row>
+          <Volunteer_report ref={downloadRef} style={{ display: 'none' }} />
+        </Col>
       </Row>
           
       <Spin spinning={loading} tip="Loading Volunteers...">

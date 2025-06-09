@@ -7,7 +7,9 @@ import { fetchAllUnits } from '../Redux/Slices/UnitSlice';
 import { fetchAllVolinteer } from '../Redux/Slices/VolinteerSlice';
 import { fetchAttendance } from '../Redux/Slices/AttendanceSlice';
 import { title } from 'framer-motion/client';
-import Attendance_report from './Attendance_report';
+import AttendanceReportModal from '../components/Modals/AttendanceReportModal';
+
+
 
 
 
@@ -199,12 +201,10 @@ const tableData = (attendance || []).map((v, index) => ({
             Download Attendance
           </Button>
 
-          <Button onClick={handlePrint}
-                >
-                  Download Report
-          </Button>
+     <AttendanceReportModal />
 
- <Attendance_report ref={downloadRef} />
+
+
                     
         </div>
       </div>
