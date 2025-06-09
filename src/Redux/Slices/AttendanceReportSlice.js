@@ -1,12 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { fetchAttendanceReport } from "../Api/AttendanceReportApi";
+import { fetchAllAttendanceReports } from "../Api/AttendanceReportApi";
 
-// Async thunk
-export const getAttendanceReport = createAsyncThunk(
-  "attendanceReport/fetch",
-  async (id=1, { rejectWithValue }) => {
+export const getAllAttendanceReports = createAsyncThunk(
+  "attendanceReport/fetchAll",
+  async (_, { rejectWithValue }) => {
     try {
-      const data = await fetchAttendanceReport(id);
+      const data = await fetchAllAttendanceReports();
       return data;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
@@ -24,21 +23,20 @@ const attendanceReportSlice = createSlice({
   reducers: {
     clearAttendanceReport: (state) => {
       state.data = [];
-      state.error = null;
       state.loading = false;
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getAttendanceReport.pending, (state) => {
+      .addCase(getAllAttendanceReports.pending, (state) => {
         state.loading = true;
-        state.error = null;
       })
-      .addCase(getAttendanceReport.fulfilled, (state, action) => {
-        state.data = action.payload;
+      .addCase(getAllAttendanceReports.fulfilled, (state, action) => {
         state.loading = false;
+        state.data = action.payload;
       })
-      .addCase(getAttendanceReport.rejected, (state, action) => {
+      .addCase(getAllAttendanceReports.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
