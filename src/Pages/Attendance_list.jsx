@@ -7,7 +7,10 @@ import { fetchAllUnits } from '../Redux/Slices/UnitSlice';
 import { fetchAllVolinteer } from '../Redux/Slices/VolinteerSlice';
 import { fetchAttendance } from '../Redux/Slices/AttendanceSlice';
 import { title } from 'framer-motion/client';
-import Download from './Download';
+import Attendance_report from './Attendance_report';
+
+
+
 
 
 const Attendance_list = () => {
@@ -21,7 +24,7 @@ const Attendance_list = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
-  const downloadRef = useRef();
+  const downloadRef = useRef();      
 
   const handlePrint = () => {
   downloadRef.current?.print();
@@ -196,12 +199,15 @@ const tableData = (attendance || []).map((v, index) => ({
             Download Attendance
           </Button>
 
-          <Button onClick={handlePrint}>Download Report</Button>
+          <Button onClick={handlePrint}
+                >
+                  Download Report
+          </Button>
+
+ <Attendance_report ref={downloadRef} />
+                    
         </div>
       </div>
-
-      <Download ref={downloadRef} />
-
       <div
         style={{
           display: 'flex',
