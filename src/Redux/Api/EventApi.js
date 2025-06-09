@@ -2,7 +2,8 @@ import axiosInstance from "../axiosInstance";
 
 const eventAPIs = {
 
-  getAllEvents: () => axiosInstance.get("/management/events/"),
+  getAllEvents: () =>{
+    return axiosInstance.get("/management/events/")},
 
   addEvent: (newEvent) => axiosInstance.post("/management/events/", newEvent),
 

@@ -98,15 +98,18 @@ const Login = () => {
       console.log("Response:", data);
 
     if (!data.user.id) {
-      data.user.id = data.user._id || ""; // fallback if _id exists or empty string
+      data.user.id = data.user._id || ""; 
     }
 
-          // Store the email, password, and user_type in localStorage
+        
 localStorage.setItem("user", JSON.stringify(data.user));
  
+  // ✅ Store the authentication token in localStorage
+    if (data.access) {
+      localStorage.setItem('access', response.data.access);
+    }
+ 
 
-      
-      // localStorage.setItem("token", data.token); // adjust based on your API
       navigate("/");
     } catch (error) {
       console.error("Login error:", error);
