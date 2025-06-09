@@ -33,10 +33,12 @@ const AttendanceReport = forwardRef(({ report }, ref) => {
       }}
       ref={printRef}
     >
-      <div style={{ marginBottom: "40px" }}>
-        <h2 style={{ textAlign: "center" }}>
-        Attendance Report for Event {report.event_name || report.event_id}
+      {/* Wrapper with padding */}
+      <div style={{ padding: "24px" }}>
+        <h2 style={{ textAlign: "center", marginBottom: "24px" }}>
+          Attendance Report for Event {report.event_name || report.event_id}
         </h2>
+
         <table
           style={{
             width: "100%",

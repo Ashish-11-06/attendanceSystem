@@ -70,33 +70,37 @@ const AttendanceReportModal = () => {
     </div>
   ]}
 >
-        <Select
-          showSearch
-          placeholder="Select Event"
-          optionFilterProp="children"
-          style={{ width: "100%" }}
-          value={selectedEvent}
-          onChange={setSelectedEvent}
-          loading={eventsLoading}
-          filterOption={(input, option) =>
-            option.children.toLowerCase().includes(input.toLowerCase())
-          }
-        >
-          {allEvents.map((event) => (
-             <Select.Option key={event.id} value={event.id}>
-            <div style={{ display: 'flex',alignItems: 'center', gap: 6,fontSize: 14, }}>
+   <div style={{  marginTop: 24, marginBottom: 8 }}>
+  <label style={{ fontWeight: '500' }}>
+    Choose Event <span style={{ color: 'red' }}>*</span>
+  </label>
+  <Select
+    showSearch
+    placeholder="Choose Event"
+    optionFilterProp="children"
+    style={{ width: '100%' }}
+    value={selectedEvent}
+    onChange={setSelectedEvent}
+    loading={eventsLoading}
+    filterOption={(input, option) =>
+      option.children.toLowerCase().includes(input.toLowerCase())
+    }
+  >
+    {allEvents.map((event) => (
+      <Select.Option key={event.id} value={event.id}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 14 }}>
+          <p style={{ margin: 0 }}>{event.event_name || event.name}</p> -{' '}
+          <span>
+            {event.date || event.start_date
+              ? new Date(event.date || event.start_date).toLocaleDateString('en-GB')
+              : 'N/A'}
+          </span>
+        </div>
+      </Select.Option>
+    ))}
+  </Select>
+</div>
 
-            <p style={{ margin: 0 }}>{event.event_name || event.name}</p> -{' '}
-                    <span>
-                        {event.date || event.start_date
-                          ? new Date(event.date || event.start_date).toLocaleDateString('en-GB')
-                          : 'N/A'}
-                      </span>
-                </div>
-</Select.Option>
-
-          ))}
-        </Select>
       </Modal>
 
       <AttendanceReport ref={downloadRef} report={selectedReport} />
