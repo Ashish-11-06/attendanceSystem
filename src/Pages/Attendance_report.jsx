@@ -21,6 +21,7 @@ const AttendanceReport = forwardRef(({ report }, ref) => {
   }));
 
   if (!report || !report.unit_summary || report.unit_summary.length === 0) return null;
+  console.log("event_name", report?.event_name);
 
   return (
     <div
@@ -37,7 +38,9 @@ const AttendanceReport = forwardRef(({ report }, ref) => {
       <div style={{ padding: "24px" }}>
         <h2 style={{ textAlign: "center", marginBottom: "24px" }}>
           Attendance Report for Event {report.event_name || report.event_id}
+        
         </h2>
+      
 
         <table
           style={{
