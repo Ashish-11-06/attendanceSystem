@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 import {
   Card,
   Avatar,
@@ -12,8 +12,6 @@ import {
   Modal,
   Form,
   Input,
-  Row,
-  Col,
 } from 'antd';
 import {
   UploadOutlined,
@@ -21,14 +19,16 @@ import {
   EditOutlined,
   LogoutOutlined,
 } from '@ant-design/icons';
+import { useDispatch } from 'react-redux';
+import { updateUserProfile } from '../Redux/Slices/ProfileSlice';
 
 const { Title } = Typography;
 
 const Profile = () => {
-  const navigate = useNavigate(); // Initialize navigate
-  const user = JSON.parse(localStorage.getItem('user'));
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  // Determine fields and labels based on user_type
+  const user = JSON.parse(localStorage.getItem('user'));
   const isAdmin = user?.user_type === 'admin';
   const nameField = isAdmin ? 'admin_name' : 'unit_name';
   const nameLabel = isAdmin ? 'Admin Name' : 'Unit Name';
@@ -42,6 +42,7 @@ const Profile = () => {
     email: user?.email || '',
     [nameField]: user?.[nameField] || '',
     user_type: user?.user_type || '',
+    id: user?.id || '',  // very important to have id here
   });
 
   useEffect(() => {
@@ -64,36 +65,73 @@ const Profile = () => {
   const showModal = () => {
     form.setFieldsValue(profileData);
     setIsModalVisible(true);
+    console.log('Modal opened with profile data:', profileData);
   };
 
-  const handleOk = () => {
-    form
-      .validateFields()
-      .then(values => {
-        setProfileData(values);
-        setIsModalVisible(false);
-        message.success('Profile updated successfully!');
-      })
-      .catch(info => {
-        console.log('Validate Failed:', info);
-      });
-  };
+const handleOk = async () => {
+  console.log('Update button clicked');
+  try {
+    const values = await form.validateFields();
+    console.log('Form values:', values);
 
+    const actualIdToUpdate = profileData.id;
+    console.log('Updating profile with id:', actualIdToUpdate);
+
+    if (!actualIdToUpdate) {
+      message.error('Cannot update profile: missing ID!');
+      return;
+    }
+
+    const name = values.admin_name || values.unit_name;
+
+    const cleanedProfileData = {
+  email: values.email,
+  name: name,
+  user_type: values.user_type,
+  
+};
+
+  const updatedPayload = {
+  userType: values.user_type,
+  id: actualIdToUpdate,
+  profileData: cleanedProfileData,
+};
+
+    await dispatch(updateUserProfile(updatedPayload)).unwrap();
+
+    const updatedUser = { ...user, ...values };
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+
+    setProfileData(values);
+    setIsModalVisible(false);
+    message.success('Profile updated successfully!');
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    if (error.errorFields) {
+      message.error('Please fix form validation errors.');
+    } else {
+      message.error('Failed to update profile. Try again later.');
+    }
+  }
+};
+
+
+    
   const handleCancel = () => setIsModalVisible(false);
 
   const handleLogout = () => {
+    localStorage.removeItem('user');
     message.warning('Logged out!');
-    navigate('/login');  // Redirect to login page
+    navigate('/login');
   };
 
-  // Adjust avatar size for smaller screens
   const avatarSize = windowWidth < 480 ? 70 : 100;
   const titleFontSize = windowWidth < 480 ? 20 : 28;
 
   return (
     <div
       style={{
-        background: 'linear-gradient(to right, #f0f2f5, #e6f7ff)',
+        // background: 'linear-gradient(to right, #f0f2f5, #e6f7ff)',
         minHeight: '100vh',
         padding: '30px 20px',
         display: 'flex',
@@ -123,7 +161,7 @@ const Profile = () => {
         />
         <div
           style={{
-            marginTop: -60,
+             marginTop: -40,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -140,7 +178,7 @@ const Profile = () => {
               boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
             }}
           />
-          <div style={{ marginTop: 12, marginBottom: 20 }}>
+          {/* <div style={{ marginTop: 12, marginBottom: 20 }}>
             <Upload
               showUploadList={false}
               customRequest={({ file, onSuccess }) => {
@@ -157,7 +195,7 @@ const Profile = () => {
                 Change Picture
               </Button>
             </Upload>
-          </div>
+          </div> */}
 
           <Title
             level={4}
@@ -194,7 +232,7 @@ const Profile = () => {
               width: '100%',
             }}
           >
-            <Button
+            {/* <Button
               type="primary"
               icon={<EditOutlined />}
               onClick={showModal}
@@ -211,13 +249,13 @@ const Profile = () => {
               }}
             >
               Edit
-            </Button>
+            </Button> */}
 
             <Button
               icon={<LogoutOutlined />}
               onClick={handleLogout}
               style={{
-                background: 'linear-gradient(to right,rgb(126, 20, 45), #ff4b2b)',
+                background: 'linear-gradient(to right, rgb(126, 20, 45), #ff4b2b)',
                 color: 'white',
                 border: 'none',
                 borderRadius: 10,

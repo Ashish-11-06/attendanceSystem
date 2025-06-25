@@ -31,6 +31,7 @@ const EventList = () => {
       try {
         const res = await dispatch(fetchAllEvents()).unwrap();
         console.log('res', res);
+        console.log("access", access);
       } catch (err) {
         console.error('Failed to fetch events:', err);
         // message.error('Failed to load events. Please try again later.');
@@ -189,7 +190,7 @@ const EventList = () => {
       value={searchText}
       onChange={(e) => setSearchText(e.target.value)}
       prefix={<SearchOutlined style={{ color: '#999' }} />}
-      style={{ width: 250 }}
+      style={{ width: 325 }}
     />
     <DatePicker
       placeholder="Filter by date"

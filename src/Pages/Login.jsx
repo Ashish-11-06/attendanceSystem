@@ -97,12 +97,19 @@ const Login = () => {
       message.success("Login successful!");
       console.log("Response:", data);
 
-          // Store the email, password, and user_type in localStorage
+    if (!data.user.id) {
+      data.user.id = data.user._id || ""; 
+    }
+
+        
 localStorage.setItem("user", JSON.stringify(data.user));
+ 
+  // ✅ Store the authentication token in localStorage
+    if (data.access) {
+      localStorage.setItem('access', response.data.access);
+    }
+ 
 
-
-      
-      // localStorage.setItem("token", data.token); // adjust based on your API
       navigate("/");
     } catch (error) {
       console.error("Login error:", error);

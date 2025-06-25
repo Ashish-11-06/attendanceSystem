@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useRef  } from 'react';
 import { Table, Tag, Button, Select, Spin, message } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,6 +7,13 @@ import { fetchAllUnits } from '../Redux/Slices/UnitSlice';
 import { fetchAllVolinteer } from '../Redux/Slices/VolinteerSlice';
 import { fetchAttendance } from '../Redux/Slices/AttendanceSlice';
 import { title } from 'framer-motion/client';
+import AttendanceReportModal from '../components/Modals/AttendanceReportModal';
+
+
+
+
+
+
 
 const Attendance_list = () => {
   const dispatch = useDispatch();
@@ -19,6 +26,11 @@ const Attendance_list = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
+  const downloadRef = useRef();      
+
+  const handlePrint = () => {
+  downloadRef.current?.print();
+  };
 
   // Fetch events and units on mount
   useEffect(() => {
@@ -50,23 +62,38 @@ useEffect(() => {
   console.log(attendance);
 
   // Prepare table data only if both selected
-  const tableData =
-    selectedEvent && selectedUnit
-      ? attendance?.map((v, index) => ({
-          key: v.id || index,
-          atdId: v.atdId || `ATD${index + 1}`,
-          volunteerId: v.volunteer_id || v.id,
-          // event: v.event || '-',
-          unitId: v.unit_id || (v.unit && v.unit.unit_id) || '-',
-          date: v.date || '-',
-          inTime: v.inTime || '-',
-          outTime: v.outTime || '-',
-          present: typeof v.present === 'boolean' ? v.present : false,
-          remark: v.remark || '-',
-        }))
-      : [];
+  // const tableData =
+  //   selectedEvent && selectedUnit
+  //     ? attendance?.map((v, index) => ({
+  //         key: v.id || index,
+  //         atdId: v.atdId || `ATD${index + 1}`,
+  //         volunteerId: v.volunteer_id || v.id,
+  //         // event: v.event || '-',
+  //         unitId: v.unit_id || (v.unit && v.unit.unit_id) || '-',
+  //         date: v.date || '-',
+  //         inTime: v.inTime || '-',
+  //         outTime: v.outTime || '-',
+  //         present: typeof v.present === 'boolean' ? v.present : false,
+  //         remark: v.remark || '-',
+  //       }))
+  //     : [];
 
-      console.log(tableData);
+  //     console.log(tableData);
+
+const tableData = (attendance || []).map((v, index) => ({
+  key: v.id || index,
+  atdId: v.atd_id || `ATD${index + 1}`,
+  volunteerId: v.volunteer?.new_personal_number || 'N/A',
+  eventId: v.event?.event_id || 'N/A',
+  unitId: v.volunteer?.unit?.unit_id || 'N/A',
+  date: v.date ? new Date(v.date).toISOString().split('T')[0] : 'N/A', // YYYY-MM-DD
+  inTime: v.in_time || 'N/A',
+  outTime: v.out_time || 'N/A',
+  present: typeof v.present === 'boolean' ? v.present : false,
+  remark: v.remark || '-',
+}));
+
+
 
   const columns = [
     { title: 'ATD_ID', dataIndex: 'atd_id', key: 'atdId' },
@@ -157,17 +184,30 @@ useEffect(() => {
         }}
       >
         <h1 style={{ margin: 0, fontSize: '1.8rem' }}>Attendance List</h1>
-        <Button
-          type="primary"
-          icon={<DownloadOutlined />}
-          onClick={handleDownload}
-          style={{ minWidth: 120 }}
-          disabled={tableData?.length === 0}
+        
+        <div
+          style={{
+            display: 'flex',
+            gap: 12,
+          }}
         >
-          Download
-        </Button>
-      </div>
+        <Button
+            type="primary"
+            icon={<DownloadOutlined />}
+            onClick={handleDownload}
+            style={{ minWidth: 120 }}
+            disabled={tableData.length === 0}
+          >
+            Download Attendance
+          </Button>
 
+     <AttendanceReportModal />
+
+
+
+                    
+        </div>
+      </div>
       <div
         style={{
           display: 'flex',
@@ -178,6 +218,7 @@ useEffect(() => {
           justifyContent: 'flex-start',
         }}
       >
+
         {/* Event Select */}
         <div style={{ flex: '1 1 250px', minWidth: 200 }}>
           <label
