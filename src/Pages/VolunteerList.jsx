@@ -150,20 +150,19 @@ const VolunteerList = () => {
     setEditingVolunteer(null);
   };
 
+  // Add this handler to refresh list after add/update
   const handleAddOrUpdate = async (values, volunteerKey) => {
     try {
       if (volunteerKey) {
-        // Update existing volunteer
         await dispatch(updateVolinteer({ id: volunteerKey, data: values }));
         message.success('Volunteer updated successfully!');
       } else {
-        // Add new volunteer
         await dispatch(addVolinteer(values));
         message.success('Volunteer added successfully!');
       }
       setIsModalVisible(false);
       setEditingVolunteer(null);
-      dispatch(fetchAllVolinteer());
+      dispatch(fetchAllVolinteer()); // Refresh list after add/update
     } catch (err) {
       message.error('Error occurred while saving volunteer.');
     }
@@ -243,7 +242,7 @@ const VolunteerList = () => {
       <AddVolunteerModal
         visible={isModalVisible}
         onCancel={handleCancel}
-        onFinish={handleAddOrUpdate}
+        onFinish={handleAddOrUpdate} // Pass the handler here
         volunteer={editingVolunteer}
       />
     </div>
@@ -251,3 +250,4 @@ const VolunteerList = () => {
 };
 
 export default VolunteerList;
+

@@ -40,9 +40,11 @@ const handleFinish = async (values) => {
     try {
       const res = await dispatch(addVolinteer(formData));
       const msg = res?.payload?.message || 'Volunteer added successfully!';
-      
       setSuccessMsg(msg);  // Set success message
       form.resetFields();  // Reset form fields
+      setTimeout(() => {
+        window.location.reload(); // Auto refresh page after add
+      }, 1000);
     } catch (error) {
       console.error('Error adding volunteer:', error);
     }

@@ -39,7 +39,7 @@ const AppLayout = ({ children }) => {
     { key: '/volunteer-list', icon: <UsergroupAddOutlined />, label: 'Volunteer List' },
     { key: '/location-list', icon: <EnvironmentOutlined />, label: 'Location List' },
     { key: '/attendance', icon: <CalendarOutlined />, label: 'Mark Attendance' }, 
-    { key: '/attendance-list', icon: <UnderlineOutlined />, label: 'Attendance List' },
+    { key: '/attendance-list', icon: <UnderlineOutlined />, label: 'Attendance Report' },
   ];
 
   const profileMenuItem = { key: '/profile', icon: <UserOutlined />, label: 'Profile' };

@@ -40,6 +40,29 @@ export const updateUnit = createAsyncThunk(
   }
 );
 
+export const addKhetra = createAsyncThunk(
+  'units/addKhetra',
+  async (data, thunkAPI) => {
+    try {
+      const response = await unitAPIs.addKhetra(data); // Your API endpoint
+      return response.data;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.response?.data || 'Add failed');
+    }
+  }
+);
+
+export const addNewKhetra = createAsyncThunk(
+  'units/addNewKhetra',
+  async (data, thunkAPI) => {
+    try {
+      const response = await unitAPIs.addNewKhetra(data); // Your API endpoint
+      return response.data;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.response?.data || 'Add failed');
+    }
+  }
+);
 
 const unitSlice = createSlice({
   name: 'units',
@@ -93,7 +116,44 @@ const unitSlice = createSlice({
       .addCase(updateUnit.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      // ----------------------------------------
+      .addCase(addKhetra.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addKhetra.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.units.findIndex(unit => unit.unit_id === action.payload.unit_id);
+        if (index !== -1) {
+          state.units[index] = action.payload; // Update the existing unit
+        }
+      })
+      .addCase(addKhetra.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+       // ----------------------------------------
+      .addCase(addNewKhetra.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addNewKhetra.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.units.findIndex(unit => unit.unit_id === action.payload.unit_id);
+        if (index !== -1) {
+          state.units[index] = action.payload; // Update the existing unit
+        }
+      })
+      .addCase(addNewKhetra.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
+
+
+
   },
 });
 

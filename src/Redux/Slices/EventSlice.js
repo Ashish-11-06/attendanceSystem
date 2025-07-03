@@ -31,13 +31,16 @@ export const updateEvent = createAsyncThunk(
   'events/updateEvent',
   async ({ id, updatedEvent }, thunkAPI) => {
     try {
+      console.log("Update Event ID:", id); // <-- Fix: log the id, not the thunk function
       const response = await eventAPIs.updateEvent(id, updatedEvent);
+      console.log("Update Event Response:", response);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data || error.message);
     }
   }
 );
+
 
 
 
@@ -86,10 +89,7 @@ const eventSlice = createSlice({
       })
       .addCase(updateEvent.fulfilled, (state, action) => {
         state.loading = false;
-        const index = state.events.findIndex((e) => e.id === action.payload.id);
-        if (index !== -1) {
-          state.events[index] = action.payload;
-        }
+        // Do not patch the event here; fetchAllEvents will refresh the list
       })
       .addCase(updateEvent.rejected, (state, action) => {
         state.loading = false;
@@ -97,5 +97,7 @@ const eventSlice = createSlice({
       })
   },
 });
+
+
 
 export default eventSlice.reducer;

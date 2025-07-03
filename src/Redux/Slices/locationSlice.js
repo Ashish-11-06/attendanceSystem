@@ -20,6 +20,8 @@ export const addLocation = createAsyncThunk(
   async (newLocation, thunkAPI) => {
     try {
       const response = await locationAPIs.addLocation(newLocation);
+      console.log("New Location Response:", response.data);
+      
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data || error.message);

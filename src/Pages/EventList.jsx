@@ -31,7 +31,6 @@ const EventList = () => {
       try {
         const res = await dispatch(fetchAllEvents()).unwrap();
         console.log('res', res);
-        console.log("access", access);
       } catch (err) {
         console.error('Failed to fetch events:', err);
         // message.error('Failed to load events. Please try again later.');
@@ -97,23 +96,29 @@ const EventList = () => {
 
     return (
       <div>
-        {locations.map((loc, index) => (
-          <div key={index} style={{ marginBottom: '8px' }}>
-            <div>
-              <strong>{loc.location_address}, {loc.location_city}</strong>
+        {locations.map((loc, index) => {
+          // Fallback to address/city/state if location_* is undefined
+          const address = loc.location_address || loc.address || '';
+          const city = loc.location_city || loc.city || '';
+          const state = loc.location_state || loc.state || '';
+          return (
+            <div key={index} style={{ marginBottom: '8px' }}>
+              <div>
+                <strong>{address}, {city}{state ? `, ${state}` : ''}</strong>
+              </div>
+              {Array.isArray(loc.units) && loc.units.length > 0 ? (
+                <ul style={{ marginLeft: 16 }}>
+                  {loc.units.map((unit, idx) => (
+                    <li key={idx}>{unit.unit_name}</li>
+                  ))}
+                </ul>
+              ) : (
+                <div style={{ marginLeft: 16 }}>No units available</div>
+              )}
+              {index !== locations.length - 1 && <Divider style={{ margin: '8px 0' }} />}
             </div>
-            {Array.isArray(loc.units) && loc.units.length > 0 ? (
-              <ul style={{ marginLeft: 16 }}>
-                {loc.units.map((unit, idx) => (
-                  <li key={idx}>{unit.unit_name}</li>
-                ))}
-              </ul>
-            ) : (
-              <div style={{ marginLeft: 16 }}>No units available</div>
-            )}
-            {index !== locations.length - 1 && <Divider style={{ margin: '8px 0' }} />}
-          </div>
-        ))}
+          );
+        })}
       </div>
     );
   },
@@ -262,5 +267,6 @@ const EventList = () => {
     </div>
   );
 };
+
 
 export default EventList;

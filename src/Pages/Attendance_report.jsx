@@ -52,6 +52,7 @@ const AttendanceReport = forwardRef(({ report }, ref) => {
           <thead>
             <tr>
               {[
+                // "Khetra",
                 "Unit",
                 "Reg. Gents",
                 "Reg. Ladies",
@@ -59,7 +60,7 @@ const AttendanceReport = forwardRef(({ report }, ref) => {
                 "Unreg. Gents",
                 "Unreg. Ladies",
                 "Unreg. Total",
-                "Satsang Strength",
+                // "Satsang Strength",
                 "Grand Total",
               ].map((head, idx) => (
                 <th key={idx} style={styles.th}>
@@ -71,6 +72,7 @@ const AttendanceReport = forwardRef(({ report }, ref) => {
           <tbody>
             {report.unit_summary.map((item, idx) => (
               <tr key={idx}>
+                {/* <td style={styles.td}>{item.khetra || "N/A"}</td> */}
                 <td style={styles.td}>{item.unit_name || "N/A"}</td>
                 <td style={styles.td}>{item.total_register_male ?? 0}</td>
                 <td style={styles.td}>{item.total_register_female ?? 0}</td>
@@ -78,7 +80,7 @@ const AttendanceReport = forwardRef(({ report }, ref) => {
                 <td style={styles.td}>{item.total_unregister_male ?? 0}</td>
                 <td style={styles.td}>{item.total_unregister_female ?? 0}</td>
                 <td style={styles.td}>{item.total_unregister ?? 0}</td>
-                <td style={styles.td}>{item.total_present ?? 0}</td>
+                {/* <td style={styles.td}>{item.total_present ?? 0}</td> */}
                 <td style={styles.td}>{item.grand_total ?? 0}</td>
               </tr>
             ))}

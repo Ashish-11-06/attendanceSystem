@@ -65,6 +65,7 @@ const Volunteer_report = forwardRef((props, ref) => {
           >
             <thead>
               <tr>
+                <th style={styles.th}>Khetra</th>
                 <th style={styles.th}>Unit</th>
                 <th style={styles.th}>Reg. Gents</th>
                 <th style={styles.th}>Reg. Ladies</th>
@@ -80,6 +81,7 @@ const Volunteer_report = forwardRef((props, ref) => {
               {reportData.length > 0 ? (
                 reportData.map((item, index) => (
                   <tr key={index}>
+                    <td style={styles.td}>{item.khetra || "N/A"}</td>
                     <td style={styles.td}>{item.unit_name || "N/A"}</td>
                     <td style={styles.td}>{item.total_male ?? 0}</td>
                     <td style={styles.td}>{item.total_female ?? 0}</td>

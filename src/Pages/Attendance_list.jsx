@@ -1,5 +1,5 @@
 import React, { useState, useEffect,useRef  } from 'react';
-import { Table, Tag, Button, Select, Spin, message } from 'antd';
+import { Table, Tag, Button, Select, Spin, message, TimePicker } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllEvents } from '../Redux/Slices/EventSlice';
@@ -8,11 +8,8 @@ import { fetchAllVolinteer } from '../Redux/Slices/VolinteerSlice';
 import { fetchAttendance } from '../Redux/Slices/AttendanceSlice';
 import { title } from 'framer-motion/client';
 import AttendanceReportModal from '../components/Modals/AttendanceReportModal';
-
-
-
-
-
+import { data } from 'react-router-dom';
+import dayjs from 'dayjs';
 
 
 const Attendance_list = () => {
@@ -31,6 +28,35 @@ const Attendance_list = () => {
   const handlePrint = () => {
   downloadRef.current?.print();
   };
+
+
+const convertUTCtoIST = (timeString) => {
+  if (!timeString) return 'N/A';
+
+  const [hours, minutes, secondsWithMs] = timeString.split(':');
+  const seconds = parseInt(secondsWithMs); // safely handle milliseconds
+  const utcDate = new Date(Date.UTC(1970, 0, 1, +hours, +minutes, +seconds));
+
+  // Add 5.5 hours to convert to IST
+  const istOffsetMillis = 5.5 * 60 * 60 * 1000;
+  const istDate = new Date(utcDate.getTime() + istOffsetMillis);
+
+  return istDate.toLocaleTimeString('en-IN', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  });
+};
+
+// Helper for formatting time as 'HH:mm' after adding 5.5 hours (IST)
+const getISTTimeHHMM = (timeStr) => {
+  if (!timeStr) return '';
+  const parts = timeStr.split(':');
+  let date = dayjs('1970-01-01T' + (parts.length === 2 ? timeStr + ':00' : timeStr));
+  date = date.add(5, 'hour').add(30, 'minute');
+  return date.format('HH:mm');
+};
+
 
   // Fetch events and units on mount
   useEffect(() => {
@@ -61,34 +87,31 @@ useEffect(() => {
 
   console.log(attendance);
 
-  // Prepare table data only if both selected
-  // const tableData =
-  //   selectedEvent && selectedUnit
-  //     ? attendance?.map((v, index) => ({
-  //         key: v.id || index,
-  //         atdId: v.atdId || `ATD${index + 1}`,
-  //         volunteerId: v.volunteer_id || v.id,
-  //         // event: v.event || '-',
-  //         unitId: v.unit_id || (v.unit && v.unit.unit_id) || '-',
-  //         date: v.date || '-',
-  //         inTime: v.inTime || '-',
-  //         outTime: v.outTime || '-',
-  //         present: typeof v.present === 'boolean' ? v.present : false,
-  //         remark: v.remark || '-',
-  //       }))
-  //     : [];
+// const tableData = (attendance || []).map((v, index) => ({
+//   key: v.id || index,
+//   atdId: v.atd_id || `ATD${index + 1}`,
+//   volunteerId: v.volunteer?.new_personal_number || 'N/A',
+//   eventId: v.event?.event_id || 'N/A',
+//   unitId: v.volunteer?.unit?.unit_id || 'N/A',
+//   date: v.date ? new Date(v.date).toISOString().split('T')[0] : 'N/A', // YYYY-MM-DD
+//  inTime: convertUTCtoIST(v.in_time),
+// outTime: convertUTCtoIST(v.out_time),
+//  present: typeof v.present === 'boolean' ? v.present : false,
+//   remark: v.remark || '-',
+// }));
 
-  //     console.log(tableData);
 
 const tableData = (attendance || []).map((v, index) => ({
-  key: v.id || index,
-  atdId: v.atd_id || `ATD${index + 1}`,
-  volunteerId: v.volunteer?.new_personal_number || 'N/A',
-  eventId: v.event?.event_id || 'N/A',
+  // key: v.id || index,
+  // atdId: v.atd_id || `ATD${index + 1}`,
+  srNo: index + 1,
+  volunteerName: v.volunteer?.name || 'N/A',
+  volunteerNumber: v.volunteer?.new_personal_number || 'N/A',
+  // eventId: v.event?.event_id || 'N/A',
   unitId: v.volunteer?.unit?.unit_id || 'N/A',
   date: v.date ? new Date(v.date).toISOString().split('T')[0] : 'N/A', // YYYY-MM-DD
-  inTime: v.in_time || 'N/A',
-  outTime: v.out_time || 'N/A',
+  inTime: getISTTimeHHMM(v.in_time) || '-',
+  outTime: getISTTimeHHMM(v.out_time) || '-',
   present: typeof v.present === 'boolean' ? v.present : false,
   remark: v.remark || '-',
 }));
@@ -96,20 +119,24 @@ const tableData = (attendance || []).map((v, index) => ({
 
 
   const columns = [
-    { title: 'ATD_ID', dataIndex: 'atd_id', key: 'atdId' },
-     {
-  title: 'New P no',
-  dataIndex: 'volunteer',
-  key: 'new_personal_number',
-  render: (volunteer) => volunteer?.new_personal_number	 ?? 'N/A',
-},
- 
     {
-  title: 'Event ID',
-  dataIndex: 'event', // keep this as the root object
-  key: 'eventId',
-  render: (event) => event?.event_id?? 'N/A',
-},
+      title: 'Sr.No.',
+      dataIndex: 'sr_no',
+      key: 'sr_no',
+      render: (_, __, index) => index + 1,
+    },
+    {
+      title: 'Volunteer Name',
+      dataIndex: 'volunteer',
+      key: 'name',
+      render: (volunteer) => volunteer?.name || 'N/A',
+    },
+    {
+      title: 'New P no',
+      dataIndex: 'volunteer',
+      key: 'new_personal_number',
+      render: (volunteer) => volunteer?.new_personal_number	 ?? 'N/A',
+    },
     {
       title: 'Unit ID',
       dataIndex: 'volunteer',
@@ -117,8 +144,67 @@ const tableData = (attendance || []).map((v, index) => ({
       render: (volunteer) => volunteer?.unit?.unit_id || 'N/A',
     },
     { title: 'Date', dataIndex: 'date', key: 'date' },
-    { title: 'In Time', dataIndex: 'in_time', key: 'in_time' },
-    { title: 'Out Time', dataIndex: 'out_time', key: 'out_time' },
+    {
+      title: (
+        <span>
+          In Time<br />
+          {/* <span style={{ fontWeight: 'normal', fontSize: 12, color: '#888' }}>
+            (IST HH:mm)
+          </span> */}
+        </span>
+      ),
+      dataIndex: 'in_time',
+      key: 'in_time',
+      render: (in_time) => getISTTimeHHMM(in_time) || '-',
+    },
+    {
+      title: (
+        <span>
+          Out Time<br />
+          {/* <span style={{ fontWeight: 'normal', fontSize: 12, color: '#888' }}>
+            (IST hh:mm A)
+          </span> */}
+        </span>
+      ),
+      dataIndex: 'out_time',
+      key: 'out_time',
+      render: (out_time, record) => {
+        if (!out_time) return '-'; // Show blank if no time
+        let istTime = '';
+        if (out_time) {
+          const parts = out_time.split(':');
+          let date = dayjs('1970-01-01T' + (parts.length === 2 ? out_time + ':00' : out_time));
+          date = date.add(5, 'hour').add(30, 'minute');
+          istTime = date.format('HH:mm');
+        }
+        return (
+          <TimePicker
+            value={istTime ? dayjs(istTime, 'HH:mm') : null}
+            onChange={(time, timeString) =>
+              setAttendance((prev) =>
+                prev.map((v) =>
+                  v.key === record.key
+                    ? { ...v, out_time: timeString }
+                    : v
+                )
+              )
+            }
+            format="HH:mm"
+            placeholder="Out Time (IST)"
+          />
+        );
+      },
+      sorter: (a, b) => {
+        const getTimeInSeconds = (timeStr) => {
+          if (!timeStr) return 0;
+          const parts = timeStr.split(':');
+          if (parts.length === 2) timeStr = timeStr + ':00';
+          const [h, m, s] = timeStr.split(':').map(Number);
+          return h * 3600 + m * 60 + s;
+        };
+        return getTimeInSeconds(a.out_time) - getTimeInSeconds(b.out_time);
+      },
+    },
     {
       title: 'Present / Absent',
       dataIndex: 'present',
@@ -137,13 +223,15 @@ const tableData = (attendance || []).map((v, index) => ({
     }
 
     const csvHeader = [
-      'ATD_ID,Volunteer ID,Event ID,Unit ID,Date,In Time,Out Time,Present / Absent,Remark',
+      'Sr.No, Volunteer Name, New P No, Unit ID, Date, In Time, Out Time, Present / Absent, Remark',
     ];
     const csvRows = tableData.map((row) =>
       [
-        row.atdId,
-        row.volunteerId,
-        row.eventId,
+        // row.atdId,
+        row.srNo,
+        row.volunteerName,
+        row.volunteerNumber,
+        // row.eventId,
         row.unitId,
         row.date,
         row.inTime,
