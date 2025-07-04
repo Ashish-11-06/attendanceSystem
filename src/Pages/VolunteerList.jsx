@@ -2,7 +2,7 @@ import React, { useEffect, useState,useRef} from 'react';
 import { Table, Input, Row, Col, Button, Spin, message, Tag } from 'antd';
 import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import AddVolunteerModal from '../components/Modals/AddVolunteerModal';
-import { fetchAllVolinteer, addVolinteer, updateVolinteer } from '../Redux/Slices/VolinteerSlice';
+import { fetchAllVolinteer } from '../Redux/Slices/VolinteerSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import Volunteer_report from './Volunteer_report';
 
@@ -35,9 +35,9 @@ const VolunteerList = () => {
     const lowerSearch = searchText.toLowerCase();
     return (
       name.toLowerCase().includes(lowerSearch) ||
-      volunteer_id.toLowerCase().includes(lowerSearch) ||
-      old_personal_number.toLowerCase().includes(lowerSearch) ||
-      new_personal_number.toLowerCase().includes(lowerSearch) ||
+      volunteer_id?.toLowerCase().includes(lowerSearch) ||
+      old_personal_number?.toLowerCase().includes(lowerSearch) ||
+      new_personal_number?.toLowerCase().includes(lowerSearch) ||
       (phone ? phone.toString().toLowerCase().includes(lowerSearch) : false) ||
       (gender ? gender.toString().toLowerCase().includes(lowerSearch) : false) ||
       (email && email.toLowerCase().includes(lowerSearch))
@@ -124,15 +124,15 @@ const VolunteerList = () => {
       render: (text) => text || '-',
     },
     
-    {
-      title: 'Action',
-      key: 'action',
-      render: (_, record) => (
-        <Button type="link" onClick={() => handleEdit(record)}>
-          Edit
-        </Button>
-      ),
-    },
+    // {
+    //   title: 'Action',
+    //   key: 'action',
+    //   render: (_, record) => (
+    //     <Button type="link" onClick={() => handleEdit(record)}>
+    //       Edit
+    //     </Button>
+    //   ),
+    // },
   ];
 
   const handleAddClick = () => {
@@ -150,23 +150,7 @@ const VolunteerList = () => {
     setEditingVolunteer(null);
   };
 
-  // Add this handler to refresh list after add/update
-  const handleAddOrUpdate = async (values, volunteerKey) => {
-    try {
-      if (volunteerKey) {
-        await dispatch(updateVolinteer({ id: volunteerKey, data: values }));
-        message.success('Volunteer updated successfully!');
-      } else {
-        await dispatch(addVolinteer(values));
-        message.success('Volunteer added successfully!');
-      }
-      setIsModalVisible(false);
-      setEditingVolunteer(null);
-      dispatch(fetchAllVolinteer()); // Refresh list after add/update
-    } catch (err) {
-      message.error('Error occurred while saving volunteer.');
-    }
-  };
+
 
   return (
     <div style={{ padding: 20, background: '#f4f7fa', minHeight: '100vh', boxSizing: 'border-box' }}>
@@ -242,7 +226,6 @@ const VolunteerList = () => {
       <AddVolunteerModal
         visible={isModalVisible}
         onCancel={handleCancel}
-        onFinish={handleAddOrUpdate} // Pass the handler here
         volunteer={editingVolunteer}
       />
     </div>

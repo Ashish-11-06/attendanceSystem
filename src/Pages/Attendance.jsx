@@ -37,13 +37,28 @@ const Attendance = () => {
   const { units, loading: unitsLoading } = useSelector(
     (state) => state.units
   );
-  console.log('units:', events);
+  // console.log('units:', events);
+  const [showAlert, setShowAlert] = useState(false);
+
   
   const {
     volinteers,
     loading: attendanceLoading,
     error: attendanceError,
   } = useSelector((state) => state.volinteers);
+
+  useEffect(() => {
+  if (attendanceError && !/^</.test(attendanceError)) {
+    setShowAlert(true);
+
+    const timer = setTimeout(() => {
+      setShowAlert(false);
+    }, 5000); // 3 seconds
+
+    return () => clearTimeout(timer);
+  }
+}, [attendanceError]);
+
 
   const [form] = Form.useForm();
   const [uploadForm] = Form.useForm();
@@ -54,6 +69,7 @@ const Attendance = () => {
   const [localVolunteers, setLocalVolunteers] = useState([]);
   const [isEditMode, setIsEditMode] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [noVolunteerMsg, setNoVolunteerMsg] = useState(false);
 
   // Add state to track if attendance already exists for event/unit/date
   const [existingAttendance, setExistingAttendance] = useState(null);
@@ -72,7 +88,13 @@ const Attendance = () => {
         unit: allValues.unit,
         event: allValues.event,
       };
-      dispatch(getVolunteerByUnitId(payload));
+      dispatch(getVolunteerByUnitId(payload)).then((res) => {
+        // Check if no volunteers returned
+        if (res?.payload && Array.isArray(res.payload) && res.payload.length === 0) {
+          setNoVolunteerMsg(true);
+          setTimeout(() => setNoVolunteerMsg(false), 2000);
+        }
+      });
       setShowTable(true);
 
       // Fetch existing attendance for this event/unit/today
@@ -502,10 +524,7 @@ const formatTimePlusIST = (timeStr) => {
         .unwrap()
         .then(() => {
           message.success('Attendance successfully updated!');
-          setRefreshing(true); // Show loader
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
+          // setRefreshing(true); // Show loader 
         })
         .catch((error) => {
           console.error('Failed to update attendance:', error);
@@ -601,11 +620,18 @@ const formatTimePlusIST = (timeStr) => {
 
         {showTable && (
           <>
-            {attendanceError && (
-              // Only show error if it's not HTML (e.g., not starting with '<')
-              !/^</.test(attendanceError) && (
-                <Alert message={attendanceError.message} type="error" style={{ marginBottom: 16 }} />
-              )
+          {attendanceError && !/^</.test(attendanceError) && showAlert && (
+  <Alert message={attendanceError.message} type="error" style={{ marginBottom: 16 }} />
+)}
+
+
+            {noVolunteerMsg && (
+              <Alert
+                message="No volunteers found for this unit."
+                type="error"
+                style={{ marginBottom: 16 }}
+                showIcon
+              />
             )}
 
             <Row style={{ overflowX: 'auto' }}>

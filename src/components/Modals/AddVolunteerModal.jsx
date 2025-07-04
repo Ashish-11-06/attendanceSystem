@@ -3,7 +3,7 @@ import { Modal, Form, Select, Row, Col, Button, Upload, Spin, Alert, message } f
 import { UploadOutlined } from '@ant-design/icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchAllUnits } from '../../Redux/Slices/UnitSlice'; 
-import { addVolinteer } from '../../Redux/Slices/VolinteerSlice';
+import { addVolinteer,  fetchAllVolinteer } from '../../Redux/Slices/VolinteerSlice';
 
 const { Option } = Select;
 
@@ -18,9 +18,10 @@ const AddVolunteerModal = ({ visible, onCancel }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
 const [successMsg, setSuccessMsg] = useState(null);
+const [addVolLoading, setAddVolLoading] = useState(false);
 
   const { units, loadingUnit, errorUnit } = useSelector((state) => state.units);
-console.log('units:', units);
+// console.log('units:', units);
 
   // Fetch units if not already in the store
   useEffect(() => {
@@ -30,6 +31,7 @@ console.log('units:', units);
   }, [dispatch, units]);
 
 const handleFinish = async (values) => {
+  setAddVolLoading(true); // Set loading state
   const formData = new FormData();
   if (values.file && values.file.length > 0) {
     const file = values.file[0].originFileObj;
@@ -42,14 +44,18 @@ const handleFinish = async (values) => {
       const msg = res?.payload?.message || 'Volunteer added successfully!';
       setSuccessMsg(msg);  // Set success message
       form.resetFields();  // Reset form fields
-      setTimeout(() => {
-        window.location.reload(); // Auto refresh page after add
-      }, 1000);
+      message.success(msg); // Show success message
+      await dispatch(fetchAllVolinteer()); // Refresh volunteer list
+      onCancel(); // Close modal
+      setAddVolLoading(false); // Reset loading state
     } catch (error) {
       console.error('Error adding volunteer:', error);
+      setAddVolLoading(false); // Reset loading state
     }
   } else {
     console.error("No file uploaded");
+    message.error("Please upload an Excel file.");
+    setAddVolLoading(false); // Reset loading state
   }
 };
 
@@ -79,14 +85,7 @@ useEffect(() => {
       width="90%"
       style={{ maxWidth: 600 }}
     >
-      {successMsg && (
-  <Alert
-    message={successMsg}
-    type="success"
-    showIcon
-    style={{ marginBottom: '1rem' }}
-  />
-)}
+      
 
       {loadingUnit ? (
         <Spin tip="Loading units..." />
@@ -133,7 +132,7 @@ useEffect(() => {
                 <Button onClick={handleCancel}>Cancel</Button>
               </Col>
               <Col>
-                <Button type="primary" htmlType="submit">
+                <Button type="primary" htmlType="submit" loading={addVolLoading} disabled={addVolLoading}>
                   Add Volunteer
                 </Button>
               </Col>

@@ -319,7 +319,7 @@ const AddEventModal = ({ visible, onCancel, form, editingEvent }) => {
                     {unitsForLocation.map((unit) => (
                       <Option
                         key={unit.id}
-                        value={String(unit.id)}
+                        value={unit.id}
                       >
                         {`${unit.unit_id} - ${unit.unit_name}`}
                       </Option>

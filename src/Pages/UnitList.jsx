@@ -152,7 +152,7 @@ const UnitList = () => {
           boxShadow: '0 8px 20px rgba(0, 0, 0, 0.05)',
         }}
       >
-        <Spin spinning={loading} size="large" tip="Loading Events...">
+        <Spin spinning={loading} size="large" tip="Loading Units...">
           <Table
             dataSource={filteredData}
             columns={columns}
