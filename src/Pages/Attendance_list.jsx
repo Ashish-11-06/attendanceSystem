@@ -112,6 +112,7 @@ const tableData = (attendance || []).map((v, index) => ({
   date: v.date ? new Date(v.date).toISOString().split('T')[0] : 'N/A', // YYYY-MM-DD
   inTime: getISTTimeHHMM(v.in_time) || '-',
   outTime: getISTTimeHHMM(v.out_time) || '-',
+  
   present: typeof v.present === 'boolean' ? v.present : false,
   remark: v.remark || '-',
 }));
@@ -206,12 +207,40 @@ const tableData = (attendance || []).map((v, index) => ({
       },
     },
     {
+      title: 'Gents/Ladies',
+      dataIndex: 'volunteer',
+      key: 'volunteer',
+      render: (volunteer) => {
+        if (!volunteer) return 'N/A';
+        if (volunteer.gender === 'Male') {
+          return <Tag color="blue">Male</Tag>;
+        }
+        if (volunteer.gender === 'Female') {
+          return <Tag color="pink">Female</Tag>;
+        }
+        return 'N/A';
+      }
+    },
+    {
       title: 'Present / Absent',
       dataIndex: 'present',
       key: 'present',
       render: (present) => (
         <Tag color={present ? 'green' : 'red'}>{present ? 'Present' : 'Absent'}</Tag>
       ),
+    },
+    {
+      title: 'Reg/Un-Reg',
+      dataIndex: 'volunteer',
+      key: 'volunteer',
+      render: (volunteer) => { 
+        if (!volunteer) return 'N/A';
+        return volunteer.is_registered ? (
+          <Tag color="orange">Reg</Tag>
+        ) : (
+          <Tag color="violet">Not Reg</Tag>
+        );
+      }
     },
     { title: 'Remark', dataIndex: 'remark', key: 'remark' },
   ];
@@ -223,30 +252,46 @@ const tableData = (attendance || []).map((v, index) => ({
     }
 
     const csvHeader = [
-      'Sr.No, Volunteer Name, New P No, Unit ID, Date, In Time, Out Time, Present / Absent, Remark',
+      'Sr.No,Volunteer Name,New P No,Unit ID,Date,In Time,Out Time,Gents/Ladies,Present / Absent,Reg/Un-Reg,Remark',
     ];
-    const csvRows = tableData.map((row) =>
-      [
-        // row.atdId,
-        row.srNo,
-        row.volunteerName,
-        row.volunteerNumber,
-        // row.eventId,
-        row.unitId,
-        row.date,
-        row.inTime,
-        row.outTime,
-        row.present ? 'Present' : 'Absent',
-        row.remark,
-      ].join(',')
-    );
+    const csvRows = (attendance || []).map((v, index) => {
+      // Gents/Ladies
+      let genderLabel = 'N/A';
+      if (v.volunteer?.gender === 'Male') genderLabel = 'Gents';
+      else if (v.volunteer?.gender === 'Female') genderLabel = 'Ladies';
+
+      // Reg/Un-Reg
+      let regLabel = 'N/A';
+      if (typeof v.volunteer?.is_registered === 'boolean') {
+        regLabel = v.volunteer.is_registered ? 'Reg' : 'Not Reg';
+      }
+
+      return [
+        index + 1,
+        v.volunteer?.name || 'N/A',
+        v.volunteer?.new_personal_number || 'N/A',
+        v.volunteer?.unit?.unit_id || 'N/A',
+        v.date ? new Date(v.date).toISOString().split('T')[0] : 'N/A',
+        getISTTimeHHMM(v.in_time) || '-',
+        getISTTimeHHMM(v.out_time) || '-',
+        genderLabel,
+        typeof v.present === 'boolean' ? (v.present ? 'Present' : 'Absent') : 'Absent',
+        regLabel,
+        v.remark || '-',
+      ].join(',');
+    });
     const csvContent = [csvHeader, ...csvRows].join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', 'attendance_list.csv');
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const filename = `attendance_report_${yyyy}-${mm}-${dd}.csv`;
+    link.setAttribute('download', filename);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

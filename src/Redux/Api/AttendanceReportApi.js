@@ -4,7 +4,7 @@ import axiosInstance from "../axiosInstance";
 export const fetchAttendanceReportById = async (event_id) => {
   if (!event_id) throw new Error("Event ID is required");
   try {
-    const response = await axiosInstance.get(`/management/attendance-report/${event_id}`);
+    const response = await axiosInstance.get(`/management/attendance-report/${event_id}/`);
     return {
       event_id,
       unit_summary: response.data.unit_summary || [],
