@@ -207,7 +207,7 @@ const tableData = (attendance || []).map((v, index) => ({
       },
     },
     {
-      title: 'Gents/Ladies',
+      title: 'Male/Female',
       dataIndex: 'volunteer',
       key: 'volunteer',
       render: (volunteer) => {
@@ -252,13 +252,13 @@ const tableData = (attendance || []).map((v, index) => ({
     }
 
     const csvHeader = [
-      'Sr.No,Volunteer Name,New P No,Unit ID,Date,In Time,Out Time,Gents/Ladies,Present / Absent,Reg/Un-Reg,Remark',
+      'Sr.No,Volunteer Name,New P No,Unit ID,Date,In Time,Out Time,Male/Female,Present / Absent,Reg/Un-Reg,Remark',
     ];
     const csvRows = (attendance || []).map((v, index) => {
-      // Gents/Ladies
+      // Male/Female
       let genderLabel = 'N/A';
-      if (v.volunteer?.gender === 'Male') genderLabel = 'Gents';
-      else if (v.volunteer?.gender === 'Female') genderLabel = 'Ladies';
+      if (v.volunteer?.gender === 'Male') genderLabel = 'Male';
+      else if (v.volunteer?.gender === 'Female') genderLabel = 'Female';
 
       // Reg/Un-Reg
       let regLabel = 'N/A';
@@ -280,7 +280,12 @@ const tableData = (attendance || []).map((v, index) => ({
         v.remark || '-',
       ].join(',');
     });
-    const csvContent = [csvHeader, ...csvRows].join('\n');
+
+    // Calculate total present volunteers
+    const totalPresent = (attendance || []).filter(v => v.present === true).length;
+    const totalPresentRow = [`Total Present Volunteers: ${totalPresent}`];
+
+    const csvContent = [csvHeader, ...csvRows, '', ...totalPresentRow].join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);

@@ -1,3 +1,24 @@
 .ant-message {
   z-index: 9999 !important;
 }
+
+/* Breakdown animation */
+.breakdown-enter {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+.breakdown-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 400ms ease-out;
+}
+.breakdown-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+.breakdown-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 300ms ease-in;
+}
+

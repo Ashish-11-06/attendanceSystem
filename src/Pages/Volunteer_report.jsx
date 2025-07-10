@@ -26,7 +26,13 @@ const Volunteer_report = forwardRef((props, ref) => {
           const pdfWidth = pdf.internal.pageSize.getWidth();
           const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
           pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-          pdf.save("volunteer-report.pdf");
+          // Add current date to filename
+          const today = new Date();
+          const yyyy = today.getFullYear();
+          const mm = String(today.getMonth() + 1).padStart(2, '0');
+          const dd = String(today.getDate()).padStart(2, '0');
+          const dateStr = `${yyyy}-${mm}-${dd}`;
+          pdf.save(`volunteer-report-${dateStr}.pdf`);
         })
         .catch((err) => {
           console.error("html2canvas error:", err);
@@ -50,6 +56,9 @@ const Volunteer_report = forwardRef((props, ref) => {
         }}
       >
         <h2 style={{ textAlign: "center", marginBottom: "20px" }}>Volunteer Report</h2>
+        <div style={{ textAlign: "center", marginBottom: "20px", fontSize: "14px" }}>
+           Date: {new Date().toLocaleDateString('en-GB')}
+        </div>
 
         {loading ? (
           <p>Loading data...</p>
@@ -73,7 +82,8 @@ const Volunteer_report = forwardRef((props, ref) => {
                 <th style={styles.th}>Unreg. Gents</th>
                 <th style={styles.th}>Unreg. Ladies</th>
                 <th style={styles.th}>Unreg. Total</th>
-                <th style={styles.th}>Satsang Strength</th>
+                <th style={styles.th}>Active. Total</th>
+                {/* <th style={styles.th}>Satsang Strength</th> */}
                 <th style={styles.th}>Grand Total</th>
               </tr>
             </thead>
@@ -85,13 +95,18 @@ const Volunteer_report = forwardRef((props, ref) => {
                     <td style={styles.td}>{item.unit_name || "N/A"}</td>
                     <td style={styles.td}>{item.total_male ?? 0}</td>
                     <td style={styles.td}>{item.total_female ?? 0}</td>
-                    <td style={styles.td}>{item.total_registered ?? 0}</td>
+                    {/* <td style={styles.td}>{item.total_registered ?? 0}</td> */}
+                    <td style={styles.td}>
+                      {(item.total_male ?? 0) + (item.total_female ?? 0)}
+                    </td>
                     <td style={styles.td}>{item.unregistered_male ?? 0}</td>
                     <td style={styles.td}>{item.unregistered_female ?? 0}</td>
                     <td style={styles.td}>{item.total_unregistered ?? 0}</td>
-                    <td style={styles.td}>
+                    <td style={styles.td}>{item.total_active ?? 0}</td>
+                    {/* <td style={styles.td}>
                       {(item.total_registered ?? 0) + (item.total_unregistered ?? 0)}
-                    </td>
+                    </td> */}
+
                     <td style={styles.td}>{item.grand_total ?? 0}</td>
                   </tr>
                 ))
